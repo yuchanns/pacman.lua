@@ -1,0 +1,53 @@
+name: Nightly Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Runtime
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - name: Build Soluna
+        uses: ./soluna/.github/actions/soluna
+        id: build
+        with:
+          soluna_path: "./soluna"
+      - name: Prepare Game Content
+        shell: bash
+        run: |
+          mkdir build
+          cp "${{ steps.build.outputs.SOLUNA_WASM_PATH }}" ./build/
+          cp "${{ steps.build.outputs.SOLUNA_JS_PATH }}" ./build/
+          zip -r ./build/main.zip main.game src
+          cp .github/assets/index.html ./build/
+          cp .github/assets/coi-serviceworker.min.js ./build/
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
