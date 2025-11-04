@@ -1,6 +1,6 @@
 version : 0.1.0
-width : 1024
-height : 768
+width : 448
+height : 576
 high_dpi : true
 soluna : 3
 background : 0x000000
