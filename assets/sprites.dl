@@ -1,0 +1,27 @@
+--
+name : blinky_anime_r_1
+filename : sprites/sprite_32_blinky.png
+--
+name : blinky_anime_r_2
+filename : sprites/sprite_33_blinky.png
+--
+name : blinky_anime_r_2
+filename : sprites/sprite_33_blinky.png
+--
+name : blinky_anime_d_1
+filename : sprites/sprite_34_blinky.png
+--
+name : blinky_anime_d_2
+filename : sprites/sprite_35_blinky.png
+--
+name : blinky_anime_l_1
+filename : sprites/sprite_36_blinky.png
+--
+name : blinky_anime_l_2
+filename : sprites/sprite_37_blinky.png
+--
+name : blinky_anime_u_1
+filename : sprites/sprite_38_blinky.png
+--
+name : blinky_anime_u_2
+filename : sprites/sprite_39_blinky.png
