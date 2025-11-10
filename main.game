@@ -1,7 +1,7 @@
 version : 0.1.0
+high_dpi : true
 width : 448
 height : 576
-high_dpi : true
 soluna : 3
 background : 0x000000
 entry : src/main.lua

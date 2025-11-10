@@ -1,5 +1,7 @@
 local ltask = require "ltask"
 local soluna = require "soluna"
+local layout = require "soluna.layout"
+local util = require "src.core.util"
 
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
 
@@ -44,6 +46,11 @@ function blinky_anim8:update(dt)
     end
 end
 
+function blinky_anim8:draw(x, y)
+    local current_frame = assert(self.frames[self.frame_index])
+    BATCH:add(current_frame, x, y)
+end
+
 ---@type fun(tick: number)
 local game_tick; do
     local tick_count = 0
@@ -56,6 +63,55 @@ local game_tick; do
 
         if tick_count % 60 == 0 then
             print(string.format("ticks=%d, elapsed=%.2f", tick_count, elapsed))
+        end
+    end
+end
+
+local doms = util.cache(function(k)
+    local filename = "assets/layouts/" .. k .. ".dl"
+    return layout.load(filename)
+end)
+
+local layout_pos = util.cache(function(k)
+    return (layout.calc(doms[k]))
+end)
+
+local hud = {}
+
+-- see @assets/layouts/hud.dl > region : map
+function hud.map(self)
+    blinky_anim8:draw(self.x, self.y)
+end
+
+---@type table<string, table> & string[]
+local layouts = { "hud" }
+layouts.hud = hud
+
+function layouts:resize(w, h)
+    for i = 1, #self do
+        local name = self[i]
+        layout_pos[name] = nil
+        local d = doms[name]
+        local screen = d["screen"]
+        screen.width = w
+        screen.height = h
+    end
+end
+
+layouts:resize(args.width, args.height)
+
+
+local function draw()
+    for i = 1, #layouts do
+        local name = layouts[i]
+        local pos = layout_pos[name]
+        for _idx, obj in ipairs(pos) do
+            if obj.region then
+                local f = layouts[name][obj.region]
+                if type(f) == "function" then
+                    f(obj)
+                end
+            end
         end
     end
 end
@@ -78,9 +134,13 @@ function callback.frame(_count)
         accumulator = accumulator - TICK
     end
 
-    -- render
-    local current_frame = assert(blinky_anim8.frames[blinky_anim8.frame_index])
-    BATCH:add(current_frame, 0, 0)
+    draw()
+end
+
+function callback.window_resize(w, h)
+    layouts:resize(w, h)
+
+    draw()
 end
 
 return callback

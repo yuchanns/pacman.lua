@@ -1,0 +1,9 @@
+id : screen
+direction : column
+justify : center
+alignItems : center
+map :
+	id : map
+	width : 448
+	height : 576
+	region : map
