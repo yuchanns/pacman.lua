@@ -2,6 +2,7 @@ local ltask = require "ltask"
 local soluna = require "soluna"
 local layout = require "soluna.layout"
 local util = require "src.core.util"
+local flow = require "src.core.flow"
 
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
 
@@ -99,22 +100,6 @@ function blinky_anim8:draw(x, y)
     BATCH:add(current_frame, x, y)
 end
 
----@type fun(tick: number)
-local game_tick; do
-    local tick_count = 0
-    local elapsed = 0.0
-    function game_tick(tick)
-        tick_count = tick_count + 1
-        elapsed = elapsed + tick
-
-        blinky_anim8:update(tick)
-
-        if tick_count % 60 == 0 then
-            print(string.format("ticks=%d, elapsed=%.2f", tick_count, elapsed))
-        end
-    end
-end
-
 local doms = util.cache(function(k)
     local filename = "assets/layouts/" .. k .. ".dl"
     return layout.load(filename)
@@ -184,8 +169,6 @@ local function game_init_playfield()
     end
 end
 
-game_init_playfield()
-
 -- see @assets/layouts/hud.dl > region : map
 function hud.map(self)
     BATCH:layer(self.x, self.y)
@@ -231,6 +214,38 @@ local draw = viewport:draw(function()
         end
     end
 end)
+
+local game = {}
+
+function game.init()
+    viewport:resize(BASE_WIDTH, BASE_HEIGHT)
+    layouts:resize(BASE_WIDTH, BASE_HEIGHT)
+
+    game_init_playfield()
+
+    return flow.state.idle
+end
+
+function game.idle()
+    print "idle"
+
+    flow.sleep(58)
+
+    return flow.state.idle
+end
+
+flow.load(game)
+
+flow.enter(flow.state.init)
+
+---@type fun(tick: number)
+local game_tick; do
+    function game_tick(tick)
+        flow.update()
+
+        blinky_anim8:update(tick)
+    end
+end
 
 function callback.frame(_count)
     local _, now_cs = ltask.now()
