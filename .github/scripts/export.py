@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Decode sprites and background tiles from the Pac-Man ROM dumps (rom_sprites.bin / rom_tiles.bin),
-and export PNGs using the palettes that the game code actually uses.
+Decode sprites and background tiles from the Pac-Man ROM dumps (rom_sprites.bin / rom_tiles.bin)
+and export per-palette-slot grayscale PNG layers (2-bit masks) that can be recolored later,
+matching the raw layering pacman.c feeds into its render pipeline.
 
 Usage:
 1. Save the 4096-byte sprite ROM as rom_sprites.bin and the 4096-byte tile ROM as rom_tiles.bin.
-2. Run the script; PNGs will be written to ./sprites_colored and ./tiles_colored.
+2. Run the script; PNGs will be written to ../assets/sprites and ../assets/tiles (relative to this file).
 """
 
 from collections import defaultdict
@@ -104,36 +105,7 @@ COLOR_CODES: Sequence[Tuple[str, int]] = [
 ]
 
 COLOR_CODE_LOOKUP = {name: code for name, code in COLOR_CODES}
-COLOR_NAME_BY_CODE: Dict[int, str] = {}
-for _name, _code in COLOR_CODES:
-    COLOR_NAME_BY_CODE.setdefault(_code, _name)
 
-# Palettes to export for each sprite based on usage in pacman.c
-SPRITE_COLOR_USAGE: dict[int, Tuple[str, ...]] = {
-    0: ("cherries",),
-    1: ("strawberry",),
-    2: ("peach",),
-    3: ("bell",),
-    4: ("apple",),
-    5: ("grapes",),
-    6: ("galaxian",),
-    7: ("key",),
-    28: ("frightened", "frightened_blink"),
-    29: ("frightened", "frightened_blink"),
-    40: ("ghost_score",),
-    41: ("ghost_score",),
-    42: ("ghost_score",),
-    43: ("ghost_score",),
-}
-
-for sprite_idx in list(range(44, 49)) + list(range(52, 64)):
-    SPRITE_COLOR_USAGE[sprite_idx] = ("pacman",)
-
-for sprite_idx in range(32, 40):
-    colors = ["blinky", "pinky", "inky", "clyde"]
-    if sprite_idx in (32, 34, 36, 38):
-        colors.append("eyes")
-    SPRITE_COLOR_USAGE[sprite_idx] = tuple(colors)
 
 FRUIT_NONE = 0
 FRUIT_CHERRIES = 1
@@ -426,9 +398,20 @@ TILE_OUTPUT_DIR.mkdir(exist_ok=True, parents=True)
 SCALE_FACTOR = 2  # Scaling factor (keep pixel art sharp with nearest-neighbor)
 SKIP_FULLY_TRANSPARENT = True  # Skip if the sprite image is fully transparent (all zeros)
 
+# additional sprite-layer PNGs for palette slots (indexed colors 1..3)
+SPRITE_LAYER_SUFFIX = {
+    1: "layer1",
+    2: "layer2",
+    3: "layer3",
+}
+
 # ---------------------------------------------------------------------------
 # 3) Decoder helper functions
 # ---------------------------------------------------------------------------
+
+def slot_suffix(slot_value: int) -> str:
+    """Return a consistent filename suffix for the given palette slot."""
+    return SPRITE_LAYER_SUFFIX.get(slot_value, f"layer{slot_value}")
 
 def load_rom_file(path: Path, expected_size: int) -> List[int]:
     try:
@@ -522,15 +505,24 @@ def decode_tile(tile_index: int) -> List[List[int]]:
 def is_sprite_fully_transparent(pixels: Iterable[int]) -> bool:
     return all(p == 0 for p in pixels)
 
-def pixels_to_rgba_image(pixel_rows: Sequence[Sequence[int]],
-                         palette_rgba: Sequence[Tuple[int, int, int, int]],
-                         scale: int = 1) -> Image.Image:
-    """Convert indexed pixels to RGBA with the provided palette and scale them by the given factor."""
+def pixels_to_slot_mask(
+    pixel_rows: Sequence[Sequence[int]],
+    slot_value: int,
+    scale: int = 1,
+) -> Image.Image:
+    """Create a white mask (RGBA) where pixels == slot_value, transparent otherwise."""
     height = len(pixel_rows)
     if height == 0:
         raise ValueError("Pixel data is empty.")
     width = len(pixel_rows[0])
-    flat_pixels = [palette_rgba[p] for row in pixel_rows for p in row]
+
+    flat_pixels = []
+    for row in pixel_rows:
+        for value in row:
+            if value == slot_value:
+                flat_pixels.append((0xFF, 0xFF, 0xFF, 0xFF))
+            else:
+                flat_pixels.append((0x00, 0x00, 0x00, 0x00))
 
     img = Image.new("RGBA", (width, height))
     img.putdata(flat_pixels)
@@ -543,60 +535,66 @@ def pixels_to_rgba_image(pixel_rows: Sequence[Sequence[int]],
 # 4) Export logic
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    global rom_sprites, rom_tiles
-    rom_sprites = load_rom_file(ROM_SPRITES_PATH, ROM_SPRITES_SIZE)
-    rom_tiles = load_rom_file(ROM_TILES_PATH, ROM_TILES_SIZE)
-    ensure_rom_lengths()
-
+def export_sprites() -> int:
     num_sprites = len(rom_sprites) // SPRITE_STRIDE
-    print(f"Detected {num_sprites} sprites.")
-
-    exported_sprite_images = 0
+    exported_layers = 0
     for sprite_idx in range(num_sprites):
-        color_names = SPRITE_COLOR_USAGE.get(sprite_idx, ())
-        if not color_names:
-            continue
-
         sprite_pixels = decode_sprite(sprite_idx)
         flat_indices = [p for row in sprite_pixels for p in row]
 
         if SKIP_FULLY_TRANSPARENT and is_sprite_fully_transparent(flat_indices):
             continue
 
-        for color_name in color_names:
-            color_code = COLOR_CODE_LOOKUP[color_name]
-            palette_rgba = build_palette_rgba(color_code)
+        used_slots = sorted({value for value in flat_indices if value})
+        if not used_slots:
+            continue
 
-            image = pixels_to_rgba_image(sprite_pixels, palette_rgba, scale=SCALE_FACTOR)
-            filename = SPRITE_OUTPUT_DIR / f"sprite_{sprite_idx:02d}_{color_name}.png"
-            image.save(filename)
-            exported_sprite_images += 1
+        for slot_value in used_slots:
+            suffix = slot_suffix(slot_value)
+            mask = pixels_to_slot_mask(sprite_pixels, slot_value, scale=SCALE_FACTOR)
+            mask_filename = SPRITE_OUTPUT_DIR / f"sprite_{sprite_idx:02d}_{suffix}.png"
+            mask.save(mask_filename)
+            exported_layers += 1
+    return exported_layers
 
-    print(f"Sprite export complete: generated {exported_sprite_images} PNG files at {SPRITE_OUTPUT_DIR.resolve()}")
 
+def export_tiles(tile_usage: Dict[int, Set[int]]) -> int:
     num_tiles = len(rom_tiles) // TILE_STRIDE
-    print(f"Detected {num_tiles} tiles.")
-
-    tile_usage = simulate_tile_usage()
-    exported_tile_images = 0
+    exported_layers = 0
     for tile_idx in range(num_tiles):
-        color_codes = sorted(tile_usage.get(tile_idx, set()))
-        if not color_codes:
+        if tile_idx not in tile_usage:
             continue
         tile_pixels = decode_tile(tile_idx)
         flat_indices = [p for row in tile_pixels for p in row]
         if SKIP_FULLY_TRANSPARENT and is_sprite_fully_transparent(flat_indices):
             continue
-        for color_code in color_codes:
-            palette_rgba = build_palette_rgba(color_code)
-            color_name = COLOR_NAME_BY_CODE.get(color_code, f"color_{color_code:02x}")
-            image = pixels_to_rgba_image(tile_pixels, palette_rgba, scale=SCALE_FACTOR)
-            filename = TILE_OUTPUT_DIR / f"tile_{tile_idx:02X}_{color_name}.png"
-            image.save(filename)
-            exported_tile_images += 1
 
-    print(f"Tile export complete: generated {exported_tile_images} PNG files at {TILE_OUTPUT_DIR.resolve()}")
+        used_slots = sorted({value for value in flat_indices if value})
+        if not used_slots:
+            continue
+
+        for slot_value in used_slots:
+            suffix = slot_suffix(slot_value)
+            mask = pixels_to_slot_mask(tile_pixels, slot_value, scale=SCALE_FACTOR)
+            mask_filename = TILE_OUTPUT_DIR / f"tile_{tile_idx:02X}_{suffix}.png"
+            mask.save(mask_filename)
+            exported_layers += 1
+    return exported_layers
+
+
+def main() -> None:
+    global rom_sprites, rom_tiles
+    rom_sprites = load_rom_file(ROM_SPRITES_PATH, ROM_SPRITES_SIZE)
+    rom_tiles = load_rom_file(ROM_TILES_PATH, ROM_TILES_SIZE)
+    ensure_rom_lengths()
+
+    sprite_layers_written = export_sprites()
+    print(f"Sprite export complete: generated {sprite_layers_written} layer PNG files at {SPRITE_OUTPUT_DIR.resolve()}")
+
+    tile_usage = simulate_tile_usage()
+    tile_layers_written = export_tiles(tile_usage)
+    print(f"Tile export complete: generated {tile_layers_written} layer PNG files at {TILE_OUTPUT_DIR.resolve()}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,10 +1,13 @@
 local ltask = require "ltask"
 local soluna = require "soluna"
 local layout = require "soluna.layout"
+local matmask = require "soluna.material.mask"
 local util = require "src.core.util"
 local flow = require "src.core.flow"
 local anim8 = require "src.core.anim8"
+local palette = require "src.palette"
 
+---@type table<string, integer | nil>
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
 
 local TICK = 1 / 60
@@ -70,15 +73,19 @@ function viewport:resize(w, h)
     self.offset_y = (1.0 - scale) * (h * 0.5)
 end
 
-local blinky = anim8.new({
-    SPRITES.blinky_anime_r_1,
-    SPRITES.blinky_anime_r_2,
-    SPRITES.blinky_anime_d_1,
-    SPRITES.blinky_anime_d_2,
-    SPRITES.blinky_anime_l_1,
-    SPRITES.blinky_anime_l_2,
-    SPRITES.blinky_anime_u_1,
-    SPRITES.blinky_anime_u_2,
+local blinky_right = anim8.new({
+    {
+        matmask.mask(assert(SPRITES.ghost_body_r_1), palette.COLOR_BLINKY),
+        matmask.mask(assert(SPRITES.ghost_body_r_2), palette.COLOR_BLINKY),
+    },
+    {
+        matmask.mask(assert(SPRITES.ghost_eye_white_r_1), palette.COLOR_EYES),
+        matmask.mask(assert(SPRITES.ghost_eye_white_r_2), palette.COLOR_EYES),
+    },
+    {
+        matmask.mask(assert(SPRITES.ghost_eye_blue_r_1), palette.COLOR_FRIGHTENED),
+        matmask.mask(assert(SPRITES.ghost_eye_blue_r_2), palette.COLOR_FRIGHTENED),
+    },
 }, 0.12)
 
 local doms = util.cache(function(k)
@@ -128,6 +135,15 @@ local function game_init_playfield()
         "L..........................R",
         "2BBBBBBBBBBBBBBBBBBBBBBBBBB3",
     }
+    local default_color = palette.COLOR_FRIGHTENED
+    local sprite_overrides <const> = {
+        ["."] = "tile_10",
+    }
+    local color_overrides <const> = {
+        ["."] = palette.COLOR_DOT,
+        P = palette.COLOR_DOT,
+        ["-"] = palette.COLOR_PINKY,
+    }
     for y = 1, DISPLAY_TILE_Y do
         for x = 1, DISPLAY_TILE_X do
             local sprite
@@ -135,10 +151,13 @@ local function game_init_playfield()
                 local i = y - 3
                 local line = assert(tiles[i])
                 local c = line:sub(x, x)
-                if c == "." then
-                    sprite = SPRITES.tile_10
-                elseif c ~= "" then
-                    sprite = SPRITES["tile_" .. c]
+                if c ~= "" then
+                    local sprite_id = sprite_overrides[c] or ("tile_" .. c)
+                    local base_sprite = SPRITES[sprite_id]
+                    if base_sprite then
+                        local color = color_overrides[c] or default_color
+                        sprite = matmask.mask(base_sprite, color)
+                    end
                 end
             end
             table.insert(hud.tiles, {
@@ -150,11 +169,48 @@ local function game_init_playfield()
     end
 end
 
+local function conv_char(c)
+    if c == " " then
+        return 40
+    elseif c == "/" then
+        return 58
+    elseif c == "-" then
+        return 59
+    elseif c == '"' then
+        return 38
+    elseif c == "!" then
+        return string.format("%02x", string.byte "Z" + 1)
+    else
+        return string.format("%02x", string.byte(c))
+    end
+end
+
+function hud:text(text, x, y)
+    for i = 1, #text do
+        local c = text:sub(i, i)
+        local code = conv_char(c)
+        local sprite = SPRITES["tile_" .. code]
+        self.tiles[y * DISPLAY_TILE_X + x + (i - 1) + 1].sprite = sprite
+    end
+end
+
+function hud:text_color(text, x, y, color)
+    for i = 1, #text do
+        local c = text:sub(i, i)
+        local code = conv_char(c)
+        local sprite = SPRITES["tile_" .. code]
+        if sprite then
+            local tinted = matmask.mask(sprite, color)
+            self.tiles[y * DISPLAY_TILE_X + x + (i - 1) + 1].sprite = tinted
+        end
+    end
+end
+
 -- see @assets/layouts/hud.dl > region : map
 function hud.map(self)
     BATCH:layer(self.x, self.y)
     -- in the middle of the map, draw blinky animation
-    blinky:draw((13 * 16), (16 * 16))
+    blinky_right:draw((13 * 16), (16 * 16))
     for _idx, tile in ipairs(hud.tiles) do
         if tile.sprite then
             BATCH:add(tile.sprite, tile.x, tile.y)
@@ -203,6 +259,9 @@ function game.init()
     layouts:resize(BASE_WIDTH, BASE_HEIGHT)
 
     game_init_playfield()
+    hud:text("HIGH SCORE", 9, 0)
+    hud:text_color("PLAYER ONE", 9, 14, palette.COLOR_INKY)
+    hud:text_color("READY!", 11, 20, palette.COLOR_PACMAN)
 
     return flow.state.idle
 end

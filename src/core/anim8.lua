@@ -110,6 +110,8 @@ end
 ---@field timer number
 ---@field position number
 ---@field status "playing" | "paused"
+---@field layered boolean
+---@field _sourceFrames any[]|nil
 local Animation = {}
 local Animationmt = { __index = Animation }
 local nop = function() end
@@ -119,35 +121,78 @@ local function assertFrames(frames)
     assert(#frames > 0, "frames table should not be empty")
 end
 
+local function normalizeFrames(frames)
+    assertFrames(frames)
+
+    local first = frames[1]
+    if type(first) ~= "table" then
+        return cloneArray(frames), #frames, false, 1
+    end
+
+    local layerCount = #frames
+    assert(layerCount > 0, "layered frames table should not be empty")
+
+    local frameCount = nil
+    local normalized = {}
+
+    for layerIndex = 1, layerCount do
+        local layerFrames = frames[layerIndex]
+        assert(type(layerFrames) == "table", ("layer %d should be a table"):format(layerIndex))
+
+        if frameCount == nil then
+            frameCount = #layerFrames
+            assert(frameCount > 0, "layered frames must contain at least one frame")
+        else
+            assert(#layerFrames == frameCount,
+                ("layer %d has %d frames; expected %d"):format(layerIndex, #layerFrames, frameCount))
+        end
+
+        for frameIndex = 1, frameCount do
+            local sprite = layerFrames[frameIndex]
+            assert(sprite ~= nil, ("missing sprite for layer %d frame %d"):format(layerIndex, frameIndex))
+            local slot = normalized[frameIndex]
+            if slot == nil then
+                slot = {}
+                normalized[frameIndex] = slot
+            end
+            slot[#slot + 1] = sprite
+        end
+    end
+
+    return normalized, frameCount, true, layerCount
+end
+
 ---@param frames any[]
 ---@param durations number|table<string, number>
 ---@param onLoop? fun(self: Animation, loops: number)|string
 ---@return Animation
 local function newAnimation(frames, durations, onLoop)
-    assertFrames(frames)
+    local processedFrames, frameCount, layered = normalizeFrames(frames)
     local td = type(durations)
     if (td ~= "number" or durations <= 0) and td ~= "table" then
         error("durations must be a positive number or a table. Was " .. tostring(durations))
     end
     onLoop = onLoop or nop
-    durations = parseDurations(durations, #frames)
+    durations = parseDurations(durations, frameCount)
     local intervals, totalDuration = parseIntervals(durations)
     return track(setmetatable({
-            frames        = cloneArray(frames),
+            frames        = processedFrames,
             durations     = durations,
             intervals     = intervals,
             totalDuration = totalDuration,
             onLoop        = onLoop,
             timer         = 0,
             position      = 1,
-            status        = "playing"
+            status        = "playing",
+            layered       = layered,
+            _sourceFrames = layered and frames or nil,
         },
         Animationmt
     ))
 end
 
 function Animation:clone()
-    return newAnimation(self.frames, self.durations, self.onLoop)
+    return newAnimation(self._sourceFrames or self.frames, self.durations, self.onLoop)
 end
 
 function Animation:release()
@@ -200,7 +245,7 @@ function Animation:getFrame()
     return self.frames[self.position]
 end
 
-local function batchDraw(sprite, x, y)
+local function draw(sprite, x, y)
     assert(BATCH, "anim8.init(batch) must be called before drawing")
     BATCH:add(sprite, x or 0, y or 0)
 end
@@ -208,7 +253,13 @@ end
 function Animation:draw(x, y)
     local sprite = self:getFrame()
     if sprite then
-        batchDraw(sprite, x, y)
+        if self.layered then
+            for i = 1, #sprite do
+                draw(sprite[i], x, y)
+            end
+        else
+            draw(sprite, x, y)
+        end
     end
 end
 

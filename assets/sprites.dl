@@ -1,147 +1,273 @@
 --
-name : blinky_anime_r_1
-filename : sprites/sprite_32_blinky.png
+name : ghost_eye_white_r_1
+filename : sprites/sprite_32_layer1.png
 --
-name : blinky_anime_r_2
-filename : sprites/sprite_33_blinky.png
+name : ghost_eye_blue_r_1
+filename : sprites/sprite_32_layer2.png
 --
-name : blinky_anime_r_2
-filename : sprites/sprite_33_blinky.png
+name : ghost_body_r_1
+filename : sprites/sprite_32_layer3.png
 --
-name : blinky_anime_d_1
-filename : sprites/sprite_34_blinky.png
+name : ghost_eye_white_r_2
+filename : sprites/sprite_33_layer1.png
 --
-name : blinky_anime_d_2
-filename : sprites/sprite_35_blinky.png
+name : ghost_eye_blue_r_2
+filename : sprites/sprite_33_layer2.png
 --
-name : blinky_anime_l_1
-filename : sprites/sprite_36_blinky.png
+name : ghost_body_r_2
+filename : sprites/sprite_33_layer3.png
 --
-name : blinky_anime_l_2
-filename : sprites/sprite_37_blinky.png
+name : ghost_eye_white_d_1
+filename : sprites/sprite_34_layer1.png
 --
-name : blinky_anime_u_1
-filename : sprites/sprite_38_blinky.png
+name : ghost_eye_blue_d_1
+filename : sprites/sprite_34_layer2.png
 --
-name : blinky_anime_u_2
-filename : sprites/sprite_39_blinky.png
+name : ghost_body_d_1
+filename : sprites/sprite_34_layer3.png
+--
+name : ghost_eye_white_d_2
+filename : sprites/sprite_35_layer1.png
+--
+name : ghost_eye_blue_d_2
+filename : sprites/sprite_35_layer2.png
+--
+name : ghost_body_d_2
+filename : sprites/sprite_35_layer3.png
+--
+name : ghost_eye_white_l_1
+filename : sprites/sprite_36_layer1.png
+--
+name : ghost_eye_blue_l_1
+filename : sprites/sprite_36_layer2.png
+--
+name : ghost_body_l_1
+filename : sprites/sprite_36_layer3.png
+--
+name : ghost_eye_white_l_2
+filename : sprites/sprite_37_layer1.png
+--
+name : ghost_eye_blue_l_2
+filename : sprites/sprite_37_layer2.png
+--
+name : ghost_body_l_2
+filename : sprites/sprite_37_layer3.png
+--
+name : ghost_eye_white_u_1
+filename : sprites/sprite_38_layer1.png
+--
+name : ghost_eye_blue_u_1
+filename : sprites/sprite_38_layer2.png
+--
+name : ghost_body_u_1
+filename : sprites/sprite_38_layer3.png
+--
+name : ghost_eye_white_u_2
+filename : sprites/sprite_39_layer1.png
+--
+name : ghost_eye_blue_u_2
+filename : sprites/sprite_39_layer2.png
+--
+name : ghost_body_u_2
+filename : sprites/sprite_39_layer3.png
 --
 name : tile_1
-filename : tiles/tile_D0_dot.png
+filename : tiles/tile_D0_layer3.png
 --
 name : tile_0
-filename : tiles/tile_D1_dot.png
+filename : tiles/tile_D1_layer3.png
 --
 name : tile_R
-filename : tiles/tile_D2_dot.png
+filename : tiles/tile_D2_layer3.png
 --
 name : tile_L
-filename : tiles/tile_D3_dot.png
+filename : tiles/tile_D3_layer3.png
 --
 name : tile_3
-filename : tiles/tile_D4_dot.png
+filename : tiles/tile_D4_layer3.png
 --
 name : tile_2
-filename : tiles/tile_D5_dot.png
+filename : tiles/tile_D5_layer3.png
 --
 name : tile_8
-filename : tiles/tile_D6_dot.png
+filename : tiles/tile_D6_layer3.png
 --
 name : tile_6
-filename : tiles/tile_D7_dot.png
+filename : tiles/tile_D7_layer3.png
 --
 name : tile_9
-filename : tiles/tile_D8_dot.png
+filename : tiles/tile_D8_layer3.png
 --
 name : tile_7
-filename : tiles/tile_D9_dot.png
+filename : tiles/tile_D9_layer3.png
 --
 name : tile_U
-filename : tiles/tile_DB_dot.png
+filename : tiles/tile_DB_layer3.png
 --
 name : tile_B
-filename : tiles/tile_DC_dot.png
+filename : tiles/tile_DC_layer3.png
 --
 name : tile_j
-filename : tiles/tile_DD_dot.png
+filename : tiles/tile_DD_layer3.png
 --
 name : tile_b
-filename : tiles/tile_DF_dot.png
+filename : tiles/tile_DF_layer3.png
 --
 name : tile_u
-filename : tiles/tile_E5_dot.png
+filename : tiles/tile_E5_layer3.png
 --
 name : tile_f
-filename : tiles/tile_E6_dot.png
+filename : tiles/tile_E6_layer3.png
 --
 name : tile_e
-filename : tiles/tile_E7_dot.png
+filename : tiles/tile_E7_layer3.png
 --
 name : tile_l
-filename : tiles/tile_E8_dot.png
+filename : tiles/tile_E8_layer3.png
 --
 name : tile_r
-filename : tiles/tile_E9_dot.png
+filename : tiles/tile_E9_layer3.png
 --
 name : tile_h
-filename : tiles/tile_EA_dot.png
+filename : tiles/tile_EA_layer3.png
 --
 name : tile_g
-filename : tiles/tile_EB_dot.png
+filename : tiles/tile_EB_layer3.png
 --
 name : tile_n
-filename : tiles/tile_EC_dot.png
+filename : tiles/tile_EC_layer3.png
 --
 name : tile_m
-filename : tiles/tile_ED_dot.png
+filename : tiles/tile_ED_layer3.png
 --
 name : tile_p
-filename : tiles/tile_EE_dot.png
+filename : tiles/tile_EE_layer3.png
 --
 name : tile_o
-filename : tiles/tile_EF_dot.png
+filename : tiles/tile_EF_layer3.png
 --
 name : tile_t
-filename : tiles/tile_F0_dot.png
+filename : tiles/tile_F0_layer3.png
 --
 name : tile_s
-filename : tiles/tile_F1_dot.png
+filename : tiles/tile_F1_layer3.png
 --
 name : tile_x
-filename : tiles/tile_F2_dot.png
+filename : tiles/tile_F2_layer3.png
 --
 name : tile_y
-filename : tiles/tile_F3_dot.png
+filename : tiles/tile_F3_layer3.png
 --
 name : tile_z
-filename : tiles/tile_F4_dot.png
+filename : tiles/tile_F4_layer3.png
 --
 name : tile_w
-filename : tiles/tile_F5_dot.png
+filename : tiles/tile_F5_layer3.png
 --
 name : tile_5
-filename : tiles/tile_FA_dot.png
+filename : tiles/tile_FA_layer3.png
 --
 name : tile_4
-filename : tiles/tile_FB_dot.png
+filename : tiles/tile_FB_layer3.png
 --
 name : tile_10
-filename : tiles/tile_10_dot.png
+filename : tiles/tile_10_layer1.png
 --
 name : tile_-
-filename : tiles/tile_CF_ghost_score.png
+filename : tiles/tile_CF_layer2.png
 --
 name : tile_i
-filename : tiles/tile_D2_dot.png
+filename : tiles/tile_D2_layer3.png
 --
 name : tile_q
-filename : tiles/tile_D3_dot.png
+filename : tiles/tile_D3_layer3.png
 --
 name : tile_k
-filename : tiles/tile_DB_dot.png
+filename : tiles/tile_DB_layer3.png
 --
 name : tile_p
-filename : tiles/tile_EE_dot.png
+filename : tiles/tile_EE_layer3.png
 --
 name : tile_P
-filename : tiles/tile_14_dot.png
+filename : tiles/tile_14_layer1.png
+--
+name : tile_41
+filename : tiles/tile_41_layer3.png
+--
+name : tile_42
+filename : tiles/tile_42_layer3.png
+--
+name : tile_43
+filename : tiles/tile_43_layer3.png
+--
+name : tile_44
+filename : tiles/tile_44_layer3.png
+--
+name : tile_45
+filename : tiles/tile_45_layer3.png
+--
+name : tile_46
+filename : tiles/tile_46_layer3.png
+--
+name : tile_47
+filename : tiles/tile_47_layer3.png
+--
+name : tile_48
+filename : tiles/tile_48_layer3.png
+--
+name : tile_49
+filename : tiles/tile_49_layer3.png
+--
+name : tile_4a
+filename : tiles/tile_4A_layer3.png
+--
+name : tile_4b
+filename : tiles/tile_4B_layer3.png
+--
+name : tile_4c
+filename : tiles/tile_4C_layer3.png
+--
+name : tile_4d
+filename : tiles/tile_4D_layer3.png
+--
+name : tile_4e
+filename : tiles/tile_4E_layer3.png
+--
+name : tile_4f
+filename : tiles/tile_4F_layer3.png
+--
+name : tile_50
+filename : tiles/tile_50_layer3.png
+--
+name : tile_51
+filename : tiles/tile_51_layer3.png
+--
+name : tile_52
+filename : tiles/tile_52_layer3.png
+--
+name : tile_53
+filename : tiles/tile_53_layer3.png
+--
+name : tile_54
+filename : tiles/tile_54_layer3.png
+--
+name : tile_55
+filename : tiles/tile_55_layer3.png
+--
+name : tile_56
+filename : tiles/tile_56_layer3.png
+--
+name : tile_57
+filename : tiles/tile_57_layer3.png
+--
+name : tile_58
+filename : tiles/tile_58_layer3.png
+--
+name : tile_59
+filename : tiles/tile_59_layer3.png
+--
+name : tile_5a
+filename : tiles/tile_5A_layer3.png
+--
+name : tile_5b
+filename : tiles/tile_5B_layer3.png
