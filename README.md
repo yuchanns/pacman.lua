@@ -27,7 +27,7 @@ luamake
 3. Run the game:
 
 ```bash
-./soluna/bin/msvc/release/soluna # on Windows
+.\soluna\bin\msvc\release\soluna # on Windows
 ./soluna/bin/macos/release/soluna # on macOS
 ./soluna/bin/linux/release/soluna # on Linux
 ```

@@ -3,6 +3,7 @@ local soluna = require "soluna"
 local layout = require "soluna.layout"
 local util = require "src.core.util"
 local flow = require "src.core.flow"
+local anim8 = require "src.core.anim8"
 
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
 
@@ -22,6 +23,8 @@ local args = ...
 local BATCH = args.batch
 local BASE_WIDTH <const> = args.width
 local BASE_HEIGHT <const> = args.height
+
+anim8.init(BATCH)
 
 local viewport = {
     ---@type number
@@ -67,38 +70,16 @@ function viewport:resize(w, h)
     self.offset_y = (1.0 - scale) * (h * 0.5)
 end
 
-local blinky_anim8 = {
-    ---@type table<number, number|userdata|string|nil>
-    frames = {
-        SPRITES.blinky_anime_r_1,
-        SPRITES.blinky_anime_r_2,
-        SPRITES.blinky_anime_d_1,
-        SPRITES.blinky_anime_d_2,
-        SPRITES.blinky_anime_l_1,
-        SPRITES.blinky_anime_l_2,
-        SPRITES.blinky_anime_u_1,
-        SPRITES.blinky_anime_u_2,
-    },
-    frame_index = 1,
-    timer = 0.0,
-    frame_duration = 0.12,
-}
-
-function blinky_anim8:update(dt)
-    self.timer = self.timer + dt
-    while self.timer >= self.frame_duration do
-        self.timer = self.timer - self.frame_duration
-        self.frame_index = self.frame_index + 1
-        if self.frame_index > #self.frames then
-            self.frame_index = 1
-        end
-    end
-end
-
-function blinky_anim8:draw(x, y)
-    local current_frame = assert(self.frames[self.frame_index])
-    BATCH:add(current_frame, x, y)
-end
+local blinky = anim8.new({
+    SPRITES.blinky_anime_r_1,
+    SPRITES.blinky_anime_r_2,
+    SPRITES.blinky_anime_d_1,
+    SPRITES.blinky_anime_d_2,
+    SPRITES.blinky_anime_l_1,
+    SPRITES.blinky_anime_l_2,
+    SPRITES.blinky_anime_u_1,
+    SPRITES.blinky_anime_u_2,
+}, 0.12)
 
 local doms = util.cache(function(k)
     local filename = "assets/layouts/" .. k .. ".dl"
@@ -173,7 +154,7 @@ end
 function hud.map(self)
     BATCH:layer(self.x, self.y)
     -- in the middle of the map, draw blinky animation
-    blinky_anim8:draw((13 * 16), (16 * 16))
+    blinky:draw((13 * 16), (16 * 16))
     for _idx, tile in ipairs(hud.tiles) do
         if tile.sprite then
             BATCH:add(tile.sprite, tile.x, tile.y)
@@ -243,7 +224,7 @@ local game_tick; do
     function game_tick(tick)
         flow.update()
 
-        blinky_anim8:update(tick)
+        anim8.update(tick)
     end
 end
 
