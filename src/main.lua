@@ -2,18 +2,40 @@ local ltask = require "ltask"
 local soluna = require "soluna"
 local layout = require "soluna.layout"
 local matmask = require "soluna.material.mask"
+local mattext = require "soluna.material.text"
+local font = require "soluna.font"
+local file = require "soluna.file"
 local util = require "src.core.util"
 local flow = require "src.core.flow"
 local anim8 = require "src.core.anim8"
 local palette = require "src.palette"
 
----@type table<string, integer | nil>
+---@type table<string, integer?>
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
+
+local FONT_PATH <const> = "assets/fonts/pacman.ttf"
+local FONT_NAME <const> = "Pacman Tiles"
+
+---@return integer font_id, userdata font_cobj
+local function init_font()
+    local data = assert(file.load(FONT_PATH))
+    font.import(data)
+    local font_id = assert(font.name(FONT_NAME) or font.name "")
+    return font_id, font.cobj()
+end
+
+local FONT_ID, FONT_COBJ = init_font()
 
 local TICK = 1 / 60
 local MAX_DT = 0.25
 local DISPLAY_TILE_X <const> = 28
 local DISPLAY_TILE_Y <const> = 36
+local TILE_PIXEL_SIZE <const> = 16
+
+local TEXT = util.cache(function(color)
+    local block = mattext.block(FONT_COBJ, FONT_ID, TILE_PIXEL_SIZE, color, "LT")
+    return block
+end)
 
 local last_cs
 local accumulator = 0.0
@@ -98,10 +120,21 @@ local layout_pos = util.cache(function(k)
 end)
 
 local hud = {
-    tiles = {}
+    tiles = {},
 }
 
+---@param text string
+---@param x integer
+---@param y integer
+---@param color integer?
+function hud:text(text, x, y, color)
+    color = color or palette.COLOR_EYES
+    local block = TEXT[color]
+    self.tiles[y * DISPLAY_TILE_X + x + 1].sprite = block(text, #text * TILE_PIXEL_SIZE, TILE_PIXEL_SIZE)
+end
+
 local function game_init_playfield()
+    hud.tiles = {}
     local tiles <const> = {
         "0UUUUUUUUUUUU45UUUUUUUUUUUU1",
         "L............rl............R",
@@ -162,46 +195,9 @@ local function game_init_playfield()
             end
             table.insert(hud.tiles, {
                 sprite = sprite,
-                x = (x - 1) * 16,
-                y = (y - 1) * 16,
+                x = (x - 1) * TILE_PIXEL_SIZE,
+                y = (y - 1) * TILE_PIXEL_SIZE,
             })
-        end
-    end
-end
-
-local function conv_char(c)
-    if c == " " then
-        return 40
-    elseif c == "/" then
-        return 58
-    elseif c == "-" then
-        return 59
-    elseif c == '"' then
-        return 38
-    elseif c == "!" then
-        return string.format("%02x", string.byte "Z" + 1)
-    else
-        return string.format("%02x", string.byte(c))
-    end
-end
-
-function hud:text(text, x, y)
-    for i = 1, #text do
-        local c = text:sub(i, i)
-        local code = conv_char(c)
-        local sprite = SPRITES["tile_" .. code]
-        self.tiles[y * DISPLAY_TILE_X + x + (i - 1) + 1].sprite = sprite
-    end
-end
-
-function hud:text_color(text, x, y, color)
-    for i = 1, #text do
-        local c = text:sub(i, i)
-        local code = conv_char(c)
-        local sprite = SPRITES["tile_" .. code]
-        if sprite then
-            local tinted = matmask.mask(sprite, color)
-            self.tiles[y * DISPLAY_TILE_X + x + (i - 1) + 1].sprite = tinted
         end
     end
 end
@@ -210,7 +206,7 @@ end
 function hud.map(self)
     BATCH:layer(self.x, self.y)
     -- in the middle of the map, draw blinky animation
-    blinky_right:draw((13 * 16), (16 * 16))
+    blinky_right:draw((13 * TILE_PIXEL_SIZE), (16 * TILE_PIXEL_SIZE))
     for _idx, tile in ipairs(hud.tiles) do
         if tile.sprite then
             BATCH:add(tile.sprite, tile.x, tile.y)
@@ -260,8 +256,8 @@ function game.init()
 
     game_init_playfield()
     hud:text("HIGH SCORE", 9, 0)
-    hud:text_color("PLAYER ONE", 9, 14, palette.COLOR_INKY)
-    hud:text_color("READY!", 11, 20, palette.COLOR_PACMAN)
+    hud:text("PLAYER ONE", 9, 14, palette.COLOR_INKY)
+    hud:text("READY!", 11, 20, palette.COLOR_PACMAN)
 
     return flow.state.idle
 end

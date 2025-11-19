@@ -10,10 +10,11 @@ You can play the game online at: [https://yuchanns.github.io/pacman.lua](https:/
 
 ## Play Locally
 
-1. Generate sprites and tiles:
+1. Generate sprites, tiles and fonts:
 
 ```bash
-python3 .github/scripts/export.py
+python3 .github/scripts/gen_sprites.py
+python3 .github/scripts/gen_fonts.py
 ```
 
 2. Build the game engine:
