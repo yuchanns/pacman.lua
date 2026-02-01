@@ -4,6 +4,8 @@ local mattext = require "soluna.material.text"
 
 local palette = require "src.visual.palette"
 local util = require "src.core.util"
+local state = require "src.gameplay.state"
+local anim8 = require "src.core.anim8"
 
 ---@type Batch?
 local BATCH
@@ -53,13 +55,49 @@ end
 -- see @assets/layouts/hud.dl > region : map
 function hud.map(self)
     assert(BATCH, "BATCH not initialized, call hud.init first")
+    assert(SPRITES)
 
     BATCH:layer(self.x, self.y)
+
     for _idx, tile in ipairs(hud.tiles) do
         if tile.sprite then
             BATCH:add(tile.sprite, tile.x, tile.y)
         end
     end
+
+    local p = state.actors.pacman
+    if not p.anim then
+        local c = palette.COLOR_PACMAN
+        p.anim = {
+            h = anim8.new({
+                matmask.mask(SPRITES.pacman, c),
+                matmask.mask(SPRITES.pacman_r_1, c),
+                matmask.mask(SPRITES.pacman_r_2, c),
+                matmask.mask(SPRITES.pacman_r_1, c),
+            }, 0.06),
+            v = anim8.new({
+                matmask.mask(SPRITES.pacman, c),
+                matmask.mask(SPRITES.pacman_d_1, c),
+                matmask.mask(SPRITES.pacman_d_2, c),
+                matmask.mask(SPRITES.pacman_d_1, c),
+            }, 0.06),
+        }
+    end
+    if p.visible then
+        local anim = (p.dir == "up" or p.dir == "down") and p.anim.v or p.anim.h
+        local rot = (p.dir == "left" or p.dir == "up") and math.pi or 0
+        local pivotX, pivotY = p.x + TILE_PIXEL_SIZE, p.y + TILE_PIXEL_SIZE;
+        (p.anim.h == anim and p.anim.v or p.anim.h):pause()
+        if state.freeze.ready then
+            anim:pause()
+        else
+            anim:resume()
+        end
+        BATCH:layer(1, rot, pivotX, pivotY)
+        anim:draw(-TILE_PIXEL_SIZE, -TILE_PIXEL_SIZE)
+        BATCH:layer()
+    end
+
     BATCH:layer()
 end
 

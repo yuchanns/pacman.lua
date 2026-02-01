@@ -271,3 +271,18 @@ filename : tiles/tile_5A_layer3.png
 --
 name : tile_5b
 filename : tiles/tile_5B_layer3.png
+--
+name : pacman
+filename : sprites/sprite_48_layer3.png
+--
+name : pacman_r_1
+filename : sprites/sprite_46_layer3.png
+--
+name : pacman_r_2
+filename : sprites/sprite_44_layer3.png
+--
+name : pacman_d_1
+filename : sprites/sprite_47_layer3.png
+--
+name : pacman_d_2
+filename : sprites/sprite_45_layer3.png

@@ -13,5 +13,5 @@ return function(args)
 
     flow.sleep(2 * args.tps - 4)
 
-    return flow.state.round_init
+    return flow.state.round_init, { tps = args.tps }
 end
