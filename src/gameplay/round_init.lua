@@ -2,10 +2,10 @@ local hud = require "src.visual.hud"
 local flow = require "src.core.flow"
 local palette = require "src.visual.palette"
 local state = require "src.gameplay.state"
+local map = require "src.gameplay.map"
 
-local TILE <const> = 16
 local function pos(tx, ty, ox, oy)
-    return tx * TILE + (ox or 0), ty * TILE + (oy or 0)
+    return tx * map.TILE + (ox or 0), ty * map.TILE + (oy or 0)
 end
 local NUM_DOTS <const> = 244 -- 240 small dots + 4 pills
 local NUM_LIVES <const> = 3

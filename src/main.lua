@@ -5,6 +5,7 @@ local file = require "soluna.file"
 local flow = require "src.core.flow"
 local anim8 = require "src.core.anim8"
 local viewport = require "src.visual.viewport"
+local game_state = require "src.gameplay.state"
 
 local SPRITES = soluna.load_sprites "assets/sprites.dl"
 
@@ -19,7 +20,7 @@ local TICKS_PER_SECOND <const> = 60
 local TICK <const> = 1 / TICKS_PER_SECOND
 local MAX_DT <const> = 0.25
 
-local last_cs
+local last_t
 local accumulator = 0.0
 
 ---@type Callback
@@ -74,21 +75,21 @@ game_start()
 
 ---@type fun(tick: number)
 local game_tick; do
-    function game_tick(tick)
+    function game_tick(_tick)
         flow.update()
 
-        anim8.update(tick)
+        game_state:update()
     end
 end
 
 function callback.frame(_count)
-    local _, now_cs = ltask.now()
-    if not last_cs then
-        last_cs = now_cs
+    local now_t = ltask.counter()
+    if not last_t then
+        last_t = now_t
     end
 
-    local dt = (now_cs - last_cs) / 100.0
-    last_cs = now_cs
+    local dt = now_t - last_t
+    last_t = now_t
 
     if dt > MAX_DT then
         dt = MAX_DT
@@ -98,6 +99,7 @@ function callback.frame(_count)
         game_tick(TICK)
         accumulator = accumulator - TICK
     end
+    anim8.update(dt)
 
     viewport.draw()
 end
@@ -106,6 +108,10 @@ function callback.window_resize(w, h)
     viewport.resize(w, h)
 
     viewport.draw()
+end
+
+function callback.key(keycode, state)
+    game_state:key(keycode, state)
 end
 
 return callback
