@@ -22,6 +22,10 @@ local KEY_RIGHT <const> = 262
 local KEY_LEFT <const> = 263
 local KEY_DOWN <const> = 264
 local KEY_UP <const> = 265
+local KEY_H <const> = 72
+local KEY_J <const> = 74
+local KEY_K <const> = 75
+local KEY_L <const> = 76
 
 function M:key(keycode, state)
     if state == 0 then
@@ -34,13 +38,13 @@ function M:key(keycode, state)
     if not p then
         return
     end
-    if keycode == KEY_LEFT then
+    if keycode == KEY_LEFT or keycode == KEY_H then
         p.want_dir = "left"
-    elseif keycode == KEY_RIGHT then
+    elseif keycode == KEY_RIGHT or keycode == KEY_L then
         p.want_dir = "right"
-    elseif keycode == KEY_UP then
+    elseif keycode == KEY_UP or keycode == KEY_K then
         p.want_dir = "up"
-    elseif keycode == KEY_DOWN then
+    elseif keycode == KEY_DOWN or keycode == KEY_J then
         p.want_dir = "down"
     end
 end
