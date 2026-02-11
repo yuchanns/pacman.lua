@@ -1,5 +1,6 @@
 local font = require "soluna.font"
 local matmask = require "soluna.material.mask"
+local matpq = require "soluna.material.perspective_quad"
 local mattext = require "soluna.material.text"
 
 local palette = require "src.visual.palette"
@@ -22,6 +23,21 @@ local TEXT = util.cache(function(color)
     local block = mattext.block(font.cobj(), FONT_ID, map.TILE, color, "LT")
     return block
 end)
+
+local PACMAN_PQ_STREAM = util.cache(function(key)
+    local sprite, sx, sy, color = key:match "^([^|]+)|([^|]+)|([^|]+)|([^|]+)$"
+    assert(sprite and sx and sy and color, "Invalid pacman sprite cache key")
+    return matpq.sprite(assert(tonumber(sprite)), {
+        color = assert(tonumber(color)),
+        scale_x = assert(tonumber(sx)),
+        scale_y = assert(tonumber(sy)),
+    })
+end)
+
+local function pacman_sprite(sprite, scale_x, scale_y, color)
+    local key = string.format("%d|%g|%g|%u", sprite, scale_x, scale_y, color)
+    return PACMAN_PQ_STREAM[key]
+end
 
 local hud = {
     tiles = {},
@@ -64,28 +80,27 @@ function hud.map(self)
 
     local p = state.actors.pacman
     if not p.anim then
-        local c = palette.COLOR_PACMAN
-        p.anim = {}
-        do
-            local p1 = matmask.mask(SPRITES.pacman, c)
-            local p2 = matmask.mask(SPRITES.pacman_r_1, c)
-            local p3 = matmask.mask(SPRITES.pacman_r_2, c)
-            p.anim.h = anim8.new({ p1, p2, p3, p2 }, 1)
-            anim8.unregister(p.anim.h)
-        end
-        do
-            local p1 = matmask.mask(SPRITES.pacman, c)
-            local p2 = matmask.mask(SPRITES.pacman_d_1, c)
-            local p3 = matmask.mask(SPRITES.pacman_d_2, c)
-            p.anim.v = anim8.new({ p1, p2, p3, p2 }, 1)
-            anim8.unregister(p.anim.v)
-        end
+        p.anim = {
+            h = anim8.new({
+                SPRITES.pacman,
+                SPRITES.pacman_r_1,
+                SPRITES.pacman_r_2,
+                SPRITES.pacman_r_1,
+            }, 1),
+            v = anim8.new({
+                SPRITES.pacman,
+                SPRITES.pacman_d_1,
+                SPRITES.pacman_d_2,
+                SPRITES.pacman_d_1,
+            }, 1),
+        }
+        anim8.unregister(p.anim.h)
+        anim8.unregister(p.anim.v)
     end
     if p.visible then
         local anim = (p.dir == "up" or p.dir == "down") and p.anim.v or p.anim.h
-        local rot = (p.dir == "left" or p.dir == "up") and math.pi or 0
-        local px, py = p.x + map.TILE, p.y + map.TILE;
-        (p.anim.h == anim and p.anim.v or p.anim.h):pause()
+        local other_anim = (p.anim.h == anim and p.anim.v or p.anim.h)
+        other_anim:pause()
         if state.freeze.ready then
             anim:pause()
         elseif not p.moved then
@@ -93,9 +108,17 @@ function hud.map(self)
         else
             anim:resume()
         end
-        BATCH:layer(1, rot, px, py)
-        anim:draw(-map.TILE, -map.TILE)
-        BATCH:layer()
+        local sprite = anim:getFrame()
+        if sprite then
+            local scale_x, scale_y = 1, 1
+            if p.dir == "left" then
+                scale_x = -1
+            elseif p.dir == "up" then
+                scale_y = -1
+            end
+            local stream = pacman_sprite(sprite, scale_x, scale_y, palette.COLOR_PACMAN)
+            BATCH:add(stream, p.x + map.TILE, p.y + map.TILE)
+        end
     end
 
     BATCH:layer()
