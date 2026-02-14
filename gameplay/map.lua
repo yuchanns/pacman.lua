@@ -7,15 +7,13 @@ local CMD = setmetatable({}, {
     end,
 })
 
-local default_color = 0x2121DE
 local sprite_overrieds <const> = {
     ["."] = "tile_10",
 }
-local color_overrides <const> = {
-    ["."] = 0xFFB897,
-    P = 0xFFB897,
-    ["-"] = 0xFFB8DE,
-}
+local default_color
+local color_overrides
+local map_offset_y
+local map_rows
 
 ---@type table
 local TILES
@@ -29,8 +27,8 @@ function CMD.init(map, world)
     for y = 1, config.display_tile_y do
         for x = 1, config.display_tile_x do
             local sprite
-            if y >= 4 and y <= 34 then
-                local i = y - 3
+            if y > map_offset_y and y <= map_offset_y + map_rows then
+                local i = y - map_offset_y
                 local line = assert(TILES[i])
                 local c = line:sub(x, x)
                 if c ~= "" then
@@ -63,8 +61,19 @@ local function process(system, e)
 end
 
 local function init(_, world)
+    local config = assert(world.config)
     local resources = assert(world.resources)
     TILES = resources.tiles
+    map_offset_y = assert(config.map_offset_y)
+    map_rows = assert(config.map_rows)
+
+    local colors = assert(config.colors)
+    default_color = assert(colors.COLOR_FRIGHTENED)
+    color_overrides = {
+        ["."] = assert(colors.COLOR_DOT),
+        P = assert(colors.COLOR_DOT),
+        ["-"] = assert(colors.COLOR_PINKY),
+    }
 end
 
 return tiny.processingSystem {
