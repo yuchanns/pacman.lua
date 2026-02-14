@@ -5,10 +5,13 @@ local font = require "soluna.font"
 
 ---@type table<integer, fun(string, integer, integer): userdata>
 local TEXT
+local DEFAULT_TEXT_COLOR
 
 local function init(system)
     local config = assert(system.world.config)
+    local colors = assert(config.colors)
     local font_id = assert(font.name "Pacman Tiles")
+    DEFAULT_TEXT_COLOR = assert(colors.COLOR_DEFAULT)
 
     TEXT = util.cache(function(color)
         local block = mattext.block(font.cobj(), font_id, config.tile, color, "LT")
@@ -26,7 +29,7 @@ local function process(system, e)
         texts[i] = nil
 
         local x, y = assert(text.x), assert(text.y)
-        local color = text.color or 0xDEDEDE
+        local color = text.color or DEFAULT_TEXT_COLOR
         local block = TEXT[color]
         tiles[y * config.display_tile_x + x + 1].sprite = block(text.text, #text.text * config.tile, config.tile)
     end

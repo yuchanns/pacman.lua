@@ -1,5 +1,6 @@
 local ltask = require "ltask"
 local font = require "soluna.font"
+local datalist = require "soluna.datalist"
 local file = require "soluna.file"
 local tiny = require "core.tiny"
 local soluna = require "soluna"
@@ -17,7 +18,10 @@ local callback_resize
 local callback_key
 local callback_frame
 
-local TPS = 60
+local cfg = datalist.parse(assert(file.load "assets/config.dl"))
+local map_rows = #cfg.map.tiles
+local map_cols = #cfg.map.tiles[1]
+local TPS = cfg.timing.tps
 local TICK = 1 / TPS
 
 do
@@ -26,44 +30,12 @@ do
     world.resources = {
         batch = args.batch,
         sprites = soluna.load_sprites "assets/sprites.dl",
-        tiles = {
-            "0UUUUUUUUUUUU45UUUUUUUUUUUU1",
-            "L............rl............R",
-            "L.ebbf.ebbbf.rl.ebbbf.ebbf.R",
-            "LPr  l.r   l.rl.r   l.r  lPR",
-            "L.guuh.guuuh.gh.guuuh.guuh.R",
-            "L..........................R",
-            "L.ebbf.ef.ebbbbbbf.ef.ebbf.R",
-            "L.guuh.rl.guuyxuuh.rl.guuh.R",
-            "L......rl....rl....rl......R",
-            "2BBBBf.rzbbf rl ebbwl.eBBBB3",
-            "     L.rxuuh gh guuyl.R     ",
-            "     L.rl          rl.R     ",
-            "     L.rl mjs--tjn rl.R     ",
-            "UUUUUh.gh i      q gh.gUUUUU",
-            "      .   i      q   .      ",
-            "BBBBBf.ef i      q ef.eBBBBB",
-            "     L.rl okkkkkkp rl.R     ",
-            "     L.rl          rl.R     ",
-            "     L.rl ebbbbbbf rl.R     ",
-            "0UUUUh.gh guuyxuuh gh.gUUUU1",
-            "L............rl............R",
-            "L.ebbf.ebbbf.rl.ebbbf.ebbf.R",
-            "L.guyl.guuuh.gh.guuuh.rxuh.R",
-            "LP..rl.......  .......rl..PR",
-            "6bf.rl.ef.ebbbbbbf.ef.rl.eb8",
-            "7uh.gh.rl.guuyxuuh.rl.gh.gu9",
-            "L......rl....rl....rl......R",
-            "L.ebbbbwzbbf.rl.ebbwzbbbbf.R",
-            "L.guuuuuuuuh.gh.guuuuuuuuh.R",
-            "L..........................R",
-            "2BBBBBBBBBBBBBBBBBBBBBBBBBB3",
-        },
+        tiles = cfg.map.tiles,
     }
 
-    local display_x = 28
-    local display_y = 36
-    local tile = 16
+    local display_x = cfg.display.x
+    local display_y = cfg.display.y
+    local tile = cfg.display.tile
 
     world.config = {
         base_width = display_x * tile,
@@ -77,6 +49,10 @@ do
         height = args.height,
 
         tps = TPS,
+        colors = cfg.colors,
+        map_offset_y = cfg.map.display_offset_y,
+        map_rows = map_rows,
+        map_cols = map_cols,
     }
 
     world.state = {

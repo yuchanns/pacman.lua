@@ -12,6 +12,7 @@ local pos
 
 return function(ctx)
     local config = assert(ctx.world.config)
+    local colors = assert(config.colors)
     local resources = assert(ctx.world.resources)
     local state = assert(ctx.world.state)
 
@@ -67,7 +68,7 @@ return function(ctx)
         text = "READY!",
         x = 11,
         y = 20,
-        color = 0xFFFF00,
+        color = assert(colors.COLOR_PACMAN),
     }
 
     flow.sleep(2 * config.tps - 4)

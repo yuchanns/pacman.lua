@@ -4,6 +4,7 @@ local tick = 0
 
 ---@type number, number, number , number
 local TILE, HALF_TILE, DISPLAY_PIXELS_X, DISPLAY_PIXELS_Y
+local MAP_MIN_X, MAP_MAX_X, MAP_MIN_Y, MAP_MAX_Y
 
 local TILES = {}
 
@@ -28,8 +29,8 @@ local function pixel_to_tile_pos(cx, cy)
 end
 
 local function clamp_tile_pos(tx, ty)
-    if tx < 0 then tx = 0 elseif tx > 27 then tx = 27 end
-    if ty < 3 then ty = 3 elseif ty > 33 then ty = 33 end
+    if tx < MAP_MIN_X then tx = MAP_MIN_X elseif tx > MAP_MAX_X then tx = MAP_MAX_X end
+    if ty < MAP_MIN_Y then ty = MAP_MIN_Y elseif ty > MAP_MAX_Y then ty = MAP_MAX_Y end
     return tx, ty
 end
 
@@ -176,6 +177,11 @@ local function init(_, world)
     HALF_TILE = TILE / 2
     DISPLAY_PIXELS_X = config.display_tile_x * TILE
     DISPLAY_PIXELS_Y = config.display_tile_y * TILE
+
+    MAP_MIN_X = 0
+    MAP_MAX_X = assert(config.map_cols) - 1
+    MAP_MIN_Y = assert(config.map_offset_y)
+    MAP_MAX_Y = MAP_MIN_Y + assert(config.map_rows) - 1
 
     TILES = resources.tiles
 end
