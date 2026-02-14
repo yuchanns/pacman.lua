@@ -6,4 +6,4 @@ map :
 	id : map
 	width : 448
 	height : 576
-	region : map
+	region : world
