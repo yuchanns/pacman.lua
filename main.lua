@@ -55,10 +55,19 @@ do
         map_cols = map_cols,
     }
 
+    local commands = {}
+
+    function commands.dispatch(qtype, qargs)
+        local q = commands[qtype] or {}
+        q[#q + 1] = qargs
+        commands[qtype] = q
+    end
+
     world.state = {
         keys = {},
         resize = {},
         freeze = false,
+        commands = commands,
     }
 
     tiny_add = function(...)
@@ -99,8 +108,6 @@ do
             tiles = {},
             status = nil,
         },
-        texts = {},
-        spawns = {},
     }
 
     callback_frame = function()

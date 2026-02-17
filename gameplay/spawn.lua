@@ -14,8 +14,9 @@ local function init()
     end
 end
 
-local function process(system, e)
-    local spawns = e.spawns
+local function update(system)
+    local spawns = system.world.state.commands.spawns
+    if not spawns then return end
     local world = system.world
 
     for i = 1, #spawns do
@@ -30,11 +31,10 @@ local function process(system, e)
     end
 end
 
-return tiny.processingSystem {
-    filter = tiny.requireAll "spawns",
+return tiny.system {
     priority = 3,
 
     onAddToWorld = init(),
 
-    process = process,
+    update = update,
 }

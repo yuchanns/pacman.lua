@@ -15,6 +15,7 @@ return function(ctx)
     local colors = assert(config.colors)
     local resources = assert(ctx.world.resources)
     local state = assert(ctx.world.state)
+    local commands = assert(state.commands)
 
     if pos == nil then
         pos = function(tx, ty, ox, oy)
@@ -27,11 +28,11 @@ return function(ctx)
     local e = entities[1]
 
     -- clear the "PLAYER ONE" text
-    e.texts[#e.texts + 1] = {
+    commands.dispatch("texts", {
         text = "         ",
         x = 9,
         y = 14,
-    }
+    })
 
     -- Pacman has eaten all dots, start a new round
     if num_dots_eaten >= NUM_DOTS then
@@ -49,7 +50,7 @@ return function(ctx)
 
     do
         local x, y = pos(13, 25, 0, 8)
-        e.spawns[#e.spawns + 1] = {
+        commands.dispatch("spawns", {
             kind = "player",
             args = {
                 x = x,
@@ -59,28 +60,28 @@ return function(ctx)
                 config = config,
                 resources = resources,
             },
-        }
+        })
     end
 
     num_ghosts_eaten = 0
 
-    e.texts[#e.texts + 1] = {
+    commands.dispatch("texts", {
         text = "READY!",
         x = 11,
         y = 20,
         color = assert(colors.COLOR_PACMAN),
-    }
+    })
 
     flow.sleep(2 * config.tps - 4)
 
     state.freeze = false
 
     -- clear the "READY!" text
-    e.texts[#e.texts + 1] = {
-        text = "       ",
+    commands.dispatch("texts", {
+        text = "      ",
         x = 11,
         y = 20,
-    }
+    })
 
     return flow.state.idle, ctx
 end

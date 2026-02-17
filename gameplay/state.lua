@@ -24,7 +24,7 @@ local function init(system)
 end
 
 return tiny.system {
-    filter = tiny.requireAll("map", "texts", "spawns"),
+    filter = tiny.requireAll("map"),
 
     priority = 1,
 

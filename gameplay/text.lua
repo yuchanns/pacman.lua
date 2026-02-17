@@ -20,7 +20,8 @@ local function init(system)
 end
 
 local function process(system, e)
-    local texts = e.texts
+    local texts = system.world.state.commands.texts
+    if not texts then return end
     local tiles = e.map.tiles
     local config = assert(system.world.config)
 
@@ -36,7 +37,7 @@ local function process(system, e)
 end
 
 return tiny.processingSystem {
-    filter = tiny.requireAll("texts", "map"),
+    filter = tiny.requireAll "map",
 
     priority = 3,
 
