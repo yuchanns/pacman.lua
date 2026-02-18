@@ -17,34 +17,42 @@ local sprites = util.cache(function(sprite)
     end)
 end)
 
-local function cache(sprite, scale_x, scale_y, color)
+local function cache(tbl)
+    local sprite = tbl.sprite
+    local scale_x = tbl.scale_x or 1
+    local scale_y = tbl.scale_y or 1
+    local color = tbl.color or 0x00000000
     return sprites[sprite][scale_x][scale_y][color]
 end
 
 local function process(system, e)
     local batch = assert(system.world.resources.batch)
 
-    local render_item = e.render_item
-    local position = e.position
-
-    if not render_item.visible or not render_item.sprite then
+    if not e.visible or not e.sprite then
         return
     end
 
-    local sprite = render_item.sprite
+    local color = e.color
+    local actor = e.actor
+    local pos = actor.pos
 
-    local color = render_item.color
-
-    local scale_x = position.scale_x
-    local scale_y = position.scale_y
-    local x = position.x + position.offset_x
-    local y = position.y + position.offset_y
-
-    batch:add(cache(sprite, scale_x, scale_y, color), x, y)
+    local scale_x = pos.sx
+    local scale_y = pos.sy
+    local x = pos.x + pos.ox
+    local y = pos.y + pos.oy
+    for i = 1, #e.sprite do
+        local tbl = e.sprite[i]
+        batch:add(cache {
+            sprite = tbl.sprite,
+            scale_x = scale_x,
+            scale_y = scale_y,
+            color = tbl.color or color,
+        }, x, y)
+    end
 end
 
 return tiny.processingSystem {
-    filter = tiny.requireAll("render_item", "position"),
+    filter = tiny.requireAll "actor",
     priority = 2,
 
     process = process,

@@ -1,0 +1,57 @@
+pacman :
+  color : 0xFFFF00
+  actor :
+    dir : "left"
+    allow_cornering : true
+    pos :
+      x : 208
+      y : 408
+      ox : 16
+      oy : 16
+      sx : 1
+      sy : 1
+    anim :
+      ---
+      duration : 1
+      h :
+        - "pacman"
+        - "pacman_r_1"
+        - "pacman_r_2"
+        - "pacman_r_1"
+      v :
+        - "pacman"
+        - "pacman_d_1"
+        - "pacman_d_2"
+        - "pacman_d_1"
+blinky :
+  actor :
+    dir : "left"
+    pos :
+      x : 208
+      y : 216
+      ox : 16
+      oy : 16
+      sx : 1
+      sy : 1
+    anim :
+      ---
+      color : 0xDEDEDE
+      h :
+        - "ghost_eye_white_r_1"
+      v :
+        - "ghost_eye_white_d_1"
+      ---
+      color : 0x2121DE
+      h :
+        - "ghost_eye_blue_r_1"
+      v :
+        - "ghost_eye_blue_d_1"
+      ---
+      color : 0xFF0000
+      duration : 4
+      h :
+        - "ghost_body_r_1"
+        - "ghost_body_r_2"
+      v :
+        - "ghost_body_d_1"
+        - "ghost_body_d_2"

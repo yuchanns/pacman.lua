@@ -8,20 +8,11 @@ local num_dots_eaten = 0
 local num_lives = NUM_LIVES
 local num_ghosts_eaten = 0
 
-local pos
-
 return function(ctx)
     local config = assert(ctx.world.config)
     local colors = assert(config.colors)
-    local resources = assert(ctx.world.resources)
     local state = assert(ctx.world.state)
     local commands = assert(state.commands)
-
-    if pos == nil then
-        pos = function(tx, ty, ox, oy)
-            return tx * config.tile + (ox or 0), ty * config.tile + (oy or 0)
-        end
-    end
 
     local entities = ctx.entities
     assert(#entities == 1, "expected exactly one entity in game state, got " .. tostring(#entities))
@@ -48,21 +39,6 @@ return function(ctx)
 
     state.freeze = true
 
-    do
-        local x, y = pos(13, 25, 0, 8)
-        commands.dispatch("spawns", {
-            kind = "player",
-            args = {
-                x = x,
-                y = y,
-                dir = "left",
-                visible = true,
-                config = config,
-                resources = resources,
-            },
-        })
-    end
-
     num_ghosts_eaten = 0
 
     commands.dispatch("texts", {
@@ -70,6 +46,26 @@ return function(ctx)
         x = 11,
         y = 20,
         color = assert(colors.COLOR_PACMAN),
+    })
+
+    commands.dispatch("spawns", {
+        kind = "pacman",
+        args = {
+            visible = true,
+            motion = {},
+            input = {},
+        },
+    })
+
+    commands.dispatch("spawns", {
+        kind = "blinky",
+        args = {
+            visible = true,
+            motion = {},
+            state = "scatter",
+            dot_counter = 0,
+            dot_limit = 7,
+        },
     })
 
     flow.sleep(2 * config.tps - 4)

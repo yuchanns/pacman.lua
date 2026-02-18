@@ -1,39 +1,59 @@
 --
 name : ghost_eye_white_r_1
 filename : sprites/sprite_32_layer1.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_blue_r_1
 filename : sprites/sprite_32_layer2.png
+x : -0.5
+y : -0.5
 --
 name : ghost_body_r_1
 filename : sprites/sprite_32_layer3.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_white_r_2
 filename : sprites/sprite_33_layer1.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_blue_r_2
 filename : sprites/sprite_33_layer2.png
+x : -0.5
+y : -0.5
 --
 name : ghost_body_r_2
 filename : sprites/sprite_33_layer3.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_white_d_1
 filename : sprites/sprite_34_layer1.png
 --
 name : ghost_eye_blue_d_1
 filename : sprites/sprite_34_layer2.png
+x : -0.5
+y : -0.5
 --
 name : ghost_body_d_1
 filename : sprites/sprite_34_layer3.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_white_d_2
 filename : sprites/sprite_35_layer1.png
 --
 name : ghost_eye_blue_d_2
 filename : sprites/sprite_35_layer2.png
+x : -0.5
+y : -0.5
 --
 name : ghost_body_d_2
 filename : sprites/sprite_35_layer3.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_white_l_1
 filename : sprites/sprite_36_layer1.png

@@ -1,45 +1,54 @@
 local tiny = require "core.tiny"
 
 local function process(system, e)
-    local render_item = e.render_item
-    if not render_item.visible then
+    if not e.visible or not e.actor.anim then
         return
     end
     local state = system.world.state
-    local animation = e.animation
-    local position = e.position
-    local motion = e.motion
-    local cd = e.direction.current
+    local anims = e.actor.anim
+    local position = e.actor.pos
+    local motion = e.motion or {}
+    local cd = e.actor.dir
     if not cd then
         return
     end
 
-    local active = (cd == "up" or cd == "down") and animation.v or animation.h
-    local other = (active == animation.h) and animation.v or animation.h
+    position.sx = cd == "left" and -1 or 1
+    position.sy = cd == "up" and -1 or 1
+    local dist = motion.distance or 0
 
-    other:pause()
+    for idx, anim in ipairs(anims) do
+        local active = (cd == "up" or cd == "down") and anim.v or anim.h
+        local other = (active == anim.h) and anim.v or anim.h
 
-    if state.freeze then
-        active:pause()
-    elseif motion.blocked then
-        active:pauseAtStart()
-    elseif not motion.moved then
-        active:pause()
-    else
-        active:resume()
-        local dist = motion.distance or 0
-        if dist > 0 then
-            active:update(dist / 4)
+        other:pause()
+
+        if state.freeze then
+            active:pause()
+        elseif motion.blocked then
+            active:pauseAtStart()
+        elseif not motion.moved then
+            active:pause()
+        else
+            active:resume()
+            if dist > 0 then
+                active:update(dist / 4)
+            end
         end
-    end
 
-    render_item.sprite = active.frames[active.position]
-    position.scale_x = cd == "left" and -1 or 1
-    position.scale_y = cd == "up" and -1 or 1
+        if not e.sprite then
+            e.sprite = {}
+        end
+
+        e.sprite[idx] = {
+            sprite = active.frames[active.position],
+            color = anim.color,
+        }
+    end
 end
 
 return tiny.processingSystem {
-    filter = tiny.requireAll("animation", "direction", "motion", "render_item"),
+    filter = tiny.requireAll "actor",
     priority = 5,
 
     process = process,

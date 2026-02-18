@@ -103,28 +103,25 @@ end
 
 local function process(system, e)
     local state = system.world.state
+    if state.freeze then
+        return
+    end
+
+    if not e.visible then
+        return
+    end
     local motion = e.motion
+    if not motion then
+        return
+    end
     ---@type boolean
     motion.moved = false
     motion.distance = 0
     motion.blocked = false
 
-    if state.freeze then
-        return
-    end
+    local actor = e.actor
 
-    local render_item = e.render_item
-
-    if not render_item.visible then
-        return
-    end
-
-    local config = assert(system.world.config)
-
-    local position = e.position
-    local direction = e.direction
-
-    local cd = direction.current
+    local cd = actor.dir
     if not cd then
         return
     end
@@ -132,28 +129,30 @@ local function process(system, e)
     if e.input then
         local requested_dir = e.input.requested_dir
         if requested_dir then
-            direction.wanted = requested_dir
+            e.wanted = requested_dir
             e.input.requested_dir = nil
         end
     end
 
-    local wanted_dir = direction.wanted or cd
-    local allow_cornering = direction.allow_cornering or false
+    local pos = actor.pos
 
-    local cx = position.x + config.tile
-    local cy = position.y + config.tile
-    local px, py = position.x, position.y
+    local wanted_dir = e.wanted or cd
+    local allow_cornering = actor.allow_cornering or false
+
+    local cx = pos.x + pos.ox
+    local cy = pos.y + pos.oy
+    local px, py = pos.x, pos.y
 
     local steps = (tick % 8 ~= 0) and 2 or 0
 
     for _ = 1, steps do
         if can_move(cx, cy, wanted_dir, allow_cornering) then
-            direction.wanted = nil
-            direction.current = wanted_dir
+            e.wanted = nil
+            actor.dir = wanted_dir
         end
 
-        if can_move(cx, cy, direction.current, allow_cornering) then
-            cx, cy = move(cx, cy, direction.current, allow_cornering)
+        if can_move(cx, cy, actor.dir, allow_cornering) then
+            cx, cy = move(cx, cy, actor.dir, allow_cornering)
             motion.moved = true
         else
             break
@@ -163,10 +162,10 @@ local function process(system, e)
     if motion.moved then
         motion.distance = math.abs(px - cx) + math.abs(py - cy)
     end
-    motion.blocked = not can_move(cx, cy, direction.current, allow_cornering)
+    motion.blocked = not can_move(cx, cy, actor.dir, allow_cornering)
 
-    position.x = cx - config.tile
-    position.y = cy - config.tile
+    pos.x = cx - pos.ox
+    pos.y = cy - pos.oy
 end
 
 local function init(_, world)
@@ -191,7 +190,7 @@ local function preWrap()
 end
 
 return tiny.processingSystem {
-    filter = tiny.requireAll("motion", "position", "direction", "render_item"),
+    filter = tiny.requireAll "actor",
     priority = 4,
 
     onAddToWorld = init,

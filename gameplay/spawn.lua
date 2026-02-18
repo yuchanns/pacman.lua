@@ -1,33 +1,50 @@
 local tiny = require "core.tiny"
 local file = require "soluna.file"
+local datalist = require "soluna.datalist"
+local anim8 = require "core.anim8"
 
-local prefabs = {}
+local profiles = {}
 
 local function init()
-    for name in file.dir "gameplay/prefabs" do
-        if name:match "%.lua$" then
-            local kind = name:sub(1, -5)
-            local prefab = require("gameplay.prefabs." .. kind)
-            assert(prefab.new and prefab.reset, "prefab must have new and reset methods: " .. kind)
-            prefabs[kind] = prefab
-        end
-    end
+    profiles = datalist.parse(assert(file.load "assets/profiles.dl"))
 end
 
 local function update(system)
     local spawns = system.world.state.commands.spawns
     if not spawns then return end
     local world = system.world
+    local sprites = world.resources.sprites
 
     for i = 1, #spawns do
         local spawn = assert(spawns[i])
         spawns[i] = nil
         local kind, args = spawn.kind, spawn.args
-        local prefab = assert(prefabs[kind], "prefab not found: " .. tostring(kind))
-        local ent = prefab.new()
-        prefab.reset(ent, args or {})
+        local profile = assert(profiles[kind], "unknown spawn kind: " .. tostring(kind))
+        for k, v in pairs(args) do
+            profile[k] = v
+        end
+        local anims = profile.actor.anim or {}
+        for _, anim in ipairs(anims) do
+            local duration = anim.duration or 1
+            local hframes = anim.h
+            local vframes = anim.v
+            do
+                local frames = {}
+                for j = 1, #hframes do
+                    frames[#frames + 1] = assert(sprites[hframes[j]])
+                end
+                anim.h = anim8.newAnimation(frames, duration)
+            end
+            do
+                local frames = {}
+                for j = 1, #vframes do
+                    frames[#frames + 1] = assert(sprites[vframes[j]])
+                end
+                anim.v = anim8.newAnimation(frames, duration)
+            end
+        end
 
-        tiny.add(world, ent)
+        tiny.add(world, profile)
     end
 end
 
