@@ -6,7 +6,7 @@ local border <const> = 20
 local offset_x, offset_y, scale = 0, 0, 1
 
 local function update(system)
-    local resize = assert(system.world.state.resize)
+    local resize = system.world.state.commands.queue_resize
 
     local config = assert(system.world.config)
     for i = 1, #resize do

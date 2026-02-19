@@ -31,6 +31,8 @@ y : -0.5
 --
 name : ghost_eye_white_d_1
 filename : sprites/sprite_34_layer1.png
+x : -0.5
+y : -0.5
 --
 name : ghost_eye_blue_d_1
 filename : sprites/sprite_34_layer2.png

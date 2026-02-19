@@ -19,11 +19,11 @@ return function(ctx)
     local e = entities[1]
 
     -- clear the "PLAYER ONE" text
-    commands.dispatch("texts", {
+    commands.texts {
         text = "         ",
         x = 9,
         y = 14,
-    })
+    }
 
     -- Pacman has eaten all dots, start a new round
     if num_dots_eaten >= NUM_DOTS then
@@ -41,43 +41,68 @@ return function(ctx)
 
     num_ghosts_eaten = 0
 
-    commands.dispatch("texts", {
+    commands.texts {
         text = "READY!",
         x = 11,
         y = 20,
         color = assert(colors.COLOR_PACMAN),
-    })
+    }
 
-    commands.dispatch("spawns", {
+    commands.spawns {
         kind = "pacman",
         args = {
             visible = true,
-            motion = {},
             input = {},
         },
-    })
+    }
 
-    commands.dispatch("spawns", {
+    commands.spawns {
         kind = "blinky",
         args = {
             visible = true,
-            motion = {},
-            state = "scatter",
+            -- state = "scatter",
+            state = "house",
             dot_counter = 0,
-            dot_limit = 7,
         },
-    })
+    }
+
+    commands.spawns {
+        kind = "pinky",
+        args = {
+            visible = true,
+            state = "house",
+            dot_counter = 0,
+        },
+    }
+
+    commands.spawns {
+        kind = "inky",
+        args = {
+            visible = true,
+            state = "house",
+            dot_counter = 0,
+        },
+    }
+
+    commands.spawns {
+        kind = "clyde",
+        args = {
+            visible = true,
+            state = "house",
+            dot_counter = 0,
+        },
+    }
 
     flow.sleep(2 * config.tps - 4)
 
     state.freeze = false
 
     -- clear the "READY!" text
-    commands.dispatch("texts", {
+    commands.texts {
         text = "      ",
         x = 11,
         y = 20,
-    })
+    }
 
     return flow.state.idle, ctx
 end

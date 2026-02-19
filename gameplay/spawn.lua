@@ -10,14 +10,14 @@ local function init()
 end
 
 local function update(system)
-    local spawns = system.world.state.commands.spawns
-    if not spawns then return end
+    local queue = system.world.state.commands.queue_spawns
+    if #queue == 0 then return end
     local world = system.world
     local sprites = world.resources.sprites
 
-    for i = 1, #spawns do
-        local spawn = assert(spawns[i])
-        spawns[i] = nil
+    for i = 1, #queue do
+        local spawn = assert(queue[i])
+        queue[i] = nil
         local kind, args = spawn.kind, spawn.args
         local profile = assert(profiles[kind], "unknown spawn kind: " .. tostring(kind))
         for k, v in pairs(args) do

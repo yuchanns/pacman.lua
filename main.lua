@@ -58,14 +58,26 @@ do
     local commands = {}
 
     function commands.dispatch(qtype, qargs)
-        local q = commands[qtype] or {}
+        local queue = "queue_" .. qtype
+        local q = rawget(commands, queue) or {}
         q[#q + 1] = qargs
-        commands[qtype] = q
+        commands[queue] = q
+    end
+
+    do
+        local mt = {}
+        mt.__index = function(_, k)
+            if k:sub(1, 6) == "queue_" then
+                return {}
+            end
+            return function(...)
+                return commands.dispatch(k, ...)
+            end
+        end
+        setmetatable(commands, mt)
     end
 
     world.state = {
-        keys = {},
-        resize = {},
         freeze = false,
         commands = commands,
     }
@@ -81,16 +93,14 @@ do
     end
 
     callback_key = function(keycode, key_state)
-        local keys = world.state.keys
-        keys[#keys + 1] = {
+        commands.input {
             keycode = keycode,
             key_state = key_state,
         }
     end
 
     callback_resize = function(w, h)
-        local resize = world.state.resize
-        resize[#resize + 1] = {
+        commands.resize {
             width = w,
             height = h,
         }

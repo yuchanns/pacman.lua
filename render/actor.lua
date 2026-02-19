@@ -44,8 +44,8 @@ local function process(system, e)
         local tbl = e.sprite[i]
         batch:add(cache {
             sprite = tbl.sprite,
-            scale_x = scale_x,
-            scale_y = scale_y,
+            scale_x = tbl.sx or scale_x,
+            scale_y = tbl.sy or scale_y,
             color = tbl.color or color,
         }, x, y)
     end

@@ -20,14 +20,14 @@ local function init(system)
 end
 
 local function process(system, e)
-    local texts = system.world.state.commands.texts
-    if not texts then return end
+    local queue = system.world.state.commands.queue_texts
+    if #queue == 0 then return end
     local tiles = e.map.tiles
     local config = assert(system.world.config)
 
-    for i = 1, #texts do
-        local text = assert(texts[i])
-        texts[i] = nil
+    for i = 1, #queue do
+        local text = assert(queue[i])
+        queue[i] = nil
 
         local x, y = assert(text.x), assert(text.y)
         local color = text.color or DEFAULT_TEXT_COLOR

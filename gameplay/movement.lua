@@ -103,21 +103,13 @@ end
 
 local function process(system, e)
     local state = system.world.state
-    if state.freeze then
+    if state.freeze or e.state == "house" then
         return
     end
 
     if not e.visible then
         return
     end
-    local motion = e.motion
-    if not motion then
-        return
-    end
-    ---@type boolean
-    motion.moved = false
-    motion.distance = 0
-    motion.blocked = false
 
     local actor = e.actor
 
@@ -141,7 +133,6 @@ local function process(system, e)
 
     local cx = pos.x + pos.ox
     local cy = pos.y + pos.oy
-    local px, py = pos.x, pos.y
 
     local steps = (tick % 8 ~= 0) and 2 or 0
 
@@ -153,16 +144,12 @@ local function process(system, e)
 
         if can_move(cx, cy, actor.dir, allow_cornering) then
             cx, cy = move(cx, cy, actor.dir, allow_cornering)
-            motion.moved = true
         else
             break
         end
     end
 
-    if motion.moved then
-        motion.distance = math.abs(px - cx) + math.abs(py - cy)
-    end
-    motion.blocked = not can_move(cx, cy, actor.dir, allow_cornering)
+    e.blocked = not can_move(cx, cy, actor.dir, allow_cornering)
 
     pos.x = cx - pos.ox
     pos.y = cy - pos.oy

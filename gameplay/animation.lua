@@ -7,7 +7,6 @@ local function process(system, e)
     local state = system.world.state
     local anims = e.actor.anim
     local position = e.actor.pos
-    local motion = e.motion or {}
     local cd = e.actor.dir
     if not cd then
         return
@@ -15,7 +14,6 @@ local function process(system, e)
 
     position.sx = cd == "left" and -1 or 1
     position.sy = cd == "up" and -1 or 1
-    local dist = motion.distance or 0
 
     for idx, anim in ipairs(anims) do
         local active = (cd == "up" or cd == "down") and anim.v or anim.h
@@ -23,26 +21,29 @@ local function process(system, e)
 
         other:pause()
 
-        if state.freeze then
-            active:pause()
-        elseif motion.blocked then
+        if state.freeze or e.blocked then
             active:pauseAtStart()
-        elseif not motion.moved then
-            active:pause()
         else
             active:resume()
-            if dist > 0 then
-                active:update(dist / 4)
-            end
         end
+        active:update(1 / 4)
 
         if not e.sprite then
             e.sprite = {}
         end
 
+        local sx, sy
+
+        if anim.dir then
+            sx = anim.dir == "left" and -1 or 1 
+            sy = anim.dir == "up" and -1 or 1
+        end
+
         e.sprite[idx] = {
             sprite = active.frames[active.position],
             color = anim.color,
+            sx = sx,
+            sy = sy,
         }
     end
 end

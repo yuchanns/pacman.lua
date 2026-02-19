@@ -11,23 +11,23 @@ return function(ctx)
 
     e.map.status = "init"
 
-    commands.dispatch("texts", {
+    commands.texts {
         text = "HIGH SCORE",
         x = 9,
         y = 0,
-    })
-    commands.dispatch("texts", {
+    }
+    commands.texts {
         text = "PLAYER ONE",
         x = 9,
         y = 14,
         color = assert(colors.COLOR_GHOST_SCORE),
-    })
-    commands.dispatch("texts", {
+    }
+    commands.texts {
         text = "READY!",
         x = 11,
         y = 20,
         color = assert(colors.COLOR_PACMAN),
-    })
+    }
 
     flow.sleep(2 * config.tps - 4)
 

@@ -21,7 +21,7 @@ local KEY_TO_DIR <const> = {
 }
 
 local function process(system, e)
-    local event = assert(system.world.state.keys)
+    local event = system.world.state.commands.queue_input
     if #event == 0 then
         return
     end

@@ -49,6 +49,108 @@ blinky :
       ---
       color : 0xFF0000
       duration : 4
+      dir : "left"
+      h :
+        - "ghost_body_r_1"
+        - "ghost_body_r_2"
+      v :
+        - "ghost_body_d_1"
+        - "ghost_body_d_2"
+pinky :
+  actor :
+    dir : "down"
+    pos :
+      x : 208
+      y : 264
+      ox : 16
+      oy : 16
+      sx : 1
+      sy : 1
+    anim :
+      ---
+      color : 0xDEDEDE
+      h :
+        - "ghost_eye_white_r_1"
+      v :
+        - "ghost_eye_white_d_1"
+      ---
+      color : 0x2121DE
+      h :
+        - "ghost_eye_blue_r_1"
+      v :
+        - "ghost_eye_blue_d_1"
+      ---
+      color : 0xFFB8DE
+      duration : 4
+      dir : "down"
+      h :
+        - "ghost_body_r_1"
+        - "ghost_body_r_2"
+      v :
+        - "ghost_body_d_1"
+        - "ghost_body_d_2"
+inky :
+  dot_limit : 30
+  actor :
+    dir : "up"
+    pos :
+      x : 176
+      y : 264
+      ox : 16
+      oy : 16
+      sx : 1
+      sy : 1
+    anim :
+      ---
+      color : 0xDEDEDE
+      h :
+        - "ghost_eye_white_r_1"
+      v :
+        - "ghost_eye_white_d_1"
+      ---
+      color : 0x2121DE
+      h :
+        - "ghost_eye_blue_r_1"
+      v :
+        - "ghost_eye_blue_d_1"
+      ---
+      color : 0x00FFDE
+      duration : 4
+      dir : "down"
+      h :
+        - "ghost_body_r_1"
+        - "ghost_body_r_2"
+      v :
+        - "ghost_body_d_1"
+        - "ghost_body_d_2"
+clyde :
+  dot_limit : 60
+  actor :
+    dir : "up"
+    pos :
+      x : 240
+      y : 264
+      ox : 16
+      oy : 16
+      sx : 1
+      sy : 1
+    anim :
+      ---
+      color : 0xDEDEDE
+      h :
+        - "ghost_eye_white_r_1"
+      v :
+        - "ghost_eye_white_d_1"
+      ---
+      color : 0x2121DE
+      h :
+        - "ghost_eye_blue_r_1"
+      v :
+        - "ghost_eye_blue_d_1"
+      ---
+      color : 0xFFB847
+      duration : 4
+      dir : "down"
       h :
         - "ghost_body_r_1"
         - "ghost_body_r_2"
