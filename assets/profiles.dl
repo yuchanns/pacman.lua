@@ -1,3 +1,85 @@
+templates:
+  pacman:
+    right :
+      - "pacman"
+      - "pacman_r_1"
+      - "pacman_r_2"
+      - "pacman_r_1"
+    down :
+      - "pacman"
+      - "pacman_d_1"
+      - "pacman_d_2"
+      - "pacman_d_1"
+    body :
+      duration : 1
+      dirs :
+        right :
+          frames : "$(templates.pacman.right)"
+        down :
+          frames : "$(templates.pacman.down)"
+        left :
+          frames : "$(templates.pacman.right)"
+          sx : -1
+        up :
+          frames : "$(templates.pacman.down)"
+          sy : -1
+    anim :
+      - "$(templates.pacman.body)"
+  ghost :
+    eye_white :
+      color : 0xDEDEDE
+      dirs :
+        right :
+          frames :
+            - "ghost_eye_white_r_1"
+        down :
+          frames :
+            - "ghost_eye_white_d_1"
+        left :
+          frames :
+            - "ghost_eye_white_l_1"
+        up :
+          frames :
+            - "ghost_eye_white_u_1"
+    eye_blue :
+      color : 0x2121DE
+      dirs :
+        right :
+          frames :
+            - "ghost_eye_blue_r_1"
+        down :
+          frames :
+            - "ghost_eye_blue_d_1"
+        left :
+          frames :
+            - "ghost_eye_blue_l_1"
+        up :
+          frames :
+            - "ghost_eye_blue_u_1"
+    body :
+      duration : 4
+      dirs :
+        right :
+          frames :
+            - "ghost_body_r_1"
+            - "ghost_body_r_2"
+        down :
+          frames :
+            - "ghost_body_d_1"
+            - "ghost_body_d_2"
+        left :
+          frames :
+            - "ghost_body_l_1"
+            - "ghost_body_l_2"
+        up :
+          frames :
+            - "ghost_body_u_1"
+            - "ghost_body_u_2"
+    anim :
+      - "$(templates.ghost.eye_white)"
+      - "$(templates.ghost.eye_blue)"
+      - "$(templates.ghost.body)"
+
 pacman :
   color : 0xFFFF00
   actor :
@@ -8,22 +90,10 @@ pacman :
       y : 408
       ox : 16
       oy : 16
-      sx : 1
-      sy : 1
-    anim :
-      ---
-      duration : 1
-      h :
-        - "pacman"
-        - "pacman_r_1"
-        - "pacman_r_2"
-        - "pacman_r_1"
-      v :
-        - "pacman"
-        - "pacman_d_1"
-        - "pacman_d_2"
-        - "pacman_d_1"
+    anim : "$(templates.pacman.anim)"
+
 blinky :
+  color : 0xFF0000
   actor :
     dir : "left"
     pos :
@@ -31,32 +101,10 @@ blinky :
       y : 216
       ox : 16
       oy : 16
-      sx : 1
-      sy : 1
-    anim :
-      ---
-      color : 0xDEDEDE
-      h :
-        - "ghost_eye_white_r_1"
-      v :
-        - "ghost_eye_white_d_1"
-      ---
-      color : 0x2121DE
-      h :
-        - "ghost_eye_blue_r_1"
-      v :
-        - "ghost_eye_blue_d_1"
-      ---
-      color : 0xFF0000
-      duration : 4
-      dir : "left"
-      h :
-        - "ghost_body_r_1"
-        - "ghost_body_r_2"
-      v :
-        - "ghost_body_d_1"
-        - "ghost_body_d_2"
+    anim : "$(templates.ghost.anim)"
+
 pinky :
+  color : 0xFFB8DE
   actor :
     dir : "down"
     pos :
@@ -64,33 +112,11 @@ pinky :
       y : 264
       ox : 16
       oy : 16
-      sx : 1
-      sy : 1
-    anim :
-      ---
-      color : 0xDEDEDE
-      h :
-        - "ghost_eye_white_r_1"
-      v :
-        - "ghost_eye_white_d_1"
-      ---
-      color : 0x2121DE
-      h :
-        - "ghost_eye_blue_r_1"
-      v :
-        - "ghost_eye_blue_d_1"
-      ---
-      color : 0xFFB8DE
-      duration : 4
-      dir : "down"
-      h :
-        - "ghost_body_r_1"
-        - "ghost_body_r_2"
-      v :
-        - "ghost_body_d_1"
-        - "ghost_body_d_2"
+    anim : "$(templates.ghost.anim)"
+
 inky :
   dot_limit : 30
+  color : 0x00FFDE
   actor :
     dir : "up"
     pos :
@@ -98,33 +124,11 @@ inky :
       y : 264
       ox : 16
       oy : 16
-      sx : 1
-      sy : 1
-    anim :
-      ---
-      color : 0xDEDEDE
-      h :
-        - "ghost_eye_white_r_1"
-      v :
-        - "ghost_eye_white_d_1"
-      ---
-      color : 0x2121DE
-      h :
-        - "ghost_eye_blue_r_1"
-      v :
-        - "ghost_eye_blue_d_1"
-      ---
-      color : 0x00FFDE
-      duration : 4
-      dir : "down"
-      h :
-        - "ghost_body_r_1"
-        - "ghost_body_r_2"
-      v :
-        - "ghost_body_d_1"
-        - "ghost_body_d_2"
+    anim : "$(templates.ghost.anim)"
+
 clyde :
   dot_limit : 60
+  color : 0xFFB847
   actor :
     dir : "up"
     pos :
@@ -132,28 +136,4 @@ clyde :
       y : 264
       ox : 16
       oy : 16
-      sx : 1
-      sy : 1
-    anim :
-      ---
-      color : 0xDEDEDE
-      h :
-        - "ghost_eye_white_r_1"
-      v :
-        - "ghost_eye_white_d_1"
-      ---
-      color : 0x2121DE
-      h :
-        - "ghost_eye_blue_r_1"
-      v :
-        - "ghost_eye_blue_d_1"
-      ---
-      color : 0xFFB847
-      duration : 4
-      dir : "down"
-      h :
-        - "ghost_body_r_1"
-        - "ghost_body_r_2"
-      v :
-        - "ghost_body_d_1"
-        - "ghost_body_d_2"
+    anim : "$(templates.ghost.anim)"

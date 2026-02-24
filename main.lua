@@ -1,3 +1,4 @@
+require "core.patch" ()
 local ltask = require "ltask"
 local font = require "soluna.font"
 local datalist = require "soluna.datalist"
@@ -26,42 +27,47 @@ local TICK = 1 / TPS
 
 do
     local world = tiny.world()
-
-    world.resources = {
-        batch = args.batch,
-        sprites = soluna.load_sprites "assets/sprites.dl",
-        tiles = cfg.map.tiles,
-    }
-
-    local display_x = cfg.display.x
-    local display_y = cfg.display.y
-    local tile = cfg.display.tile
-
-    world.config = {
-        base_width = display_x * tile,
-        base_height = display_y * tile,
-
-        display_tile_x = display_x,
-        display_tile_y = display_y,
-        tile = tile,
-
-        width = args.width,
-        height = args.height,
-
-        tps = TPS,
-        colors = cfg.colors,
-        map_offset_y = cfg.map.display_offset_y,
-        map_rows = map_rows,
-        map_cols = map_cols,
-    }
-
     local commands = {}
 
-    function commands.dispatch(qtype, qargs)
-        local queue = "queue_" .. qtype
-        local q = rawget(commands, queue) or {}
-        q[#q + 1] = qargs
-        commands[queue] = q
+    do
+        local mt = {
+            __index = function(_, k)
+                error("unknown key: " .. tostring(k))
+            end
+        }
+        setmetatable(world, mt)
+        world.resources = setmetatable({
+            batch = args.batch,
+            sprites = soluna.load_sprites "assets/sprites.dl",
+            tiles = cfg.map.tiles,
+        }, mt)
+
+        local display_x = cfg.display.x
+        local display_y = cfg.display.y
+        local tile = cfg.display.tile
+
+        world.config = setmetatable({
+            base_width = display_x * tile,
+            base_height = display_y * tile,
+
+            display_tile_x = display_x,
+            display_tile_y = display_y,
+            tile = tile,
+
+            width = args.width,
+            height = args.height,
+
+            tps = TPS,
+            colors = cfg.colors,
+            map_offset_y = cfg.map.display_offset_y,
+            map_rows = map_rows,
+            map_cols = map_cols,
+        }, mt)
+
+        world.state = setmetatable({
+            freeze = false,
+            commands = commands,
+        }, mt)
     end
 
     do
@@ -71,16 +77,14 @@ do
                 return {}
             end
             return function(...)
-                return commands.dispatch(k, ...)
+                local queue = "queue_" .. k
+                local q = rawget(commands, queue) or {}
+                q[#q + 1] = ...
+                commands[queue] = q
             end
         end
         setmetatable(commands, mt)
     end
-
-    world.state = {
-        freeze = false,
-        commands = commands,
-    }
 
     tiny_add = function(...)
         tiny.add(world, ...)
@@ -88,7 +92,7 @@ do
 
     tiny_update = function(dt, system_type)
         tiny.update(world, dt, function(_, system)
-            return system.system_type == system_type
+            return system.type == system_type
         end)
     end
 
@@ -105,6 +109,8 @@ do
             height = h,
         }
     end
+
+    callback_resize(args.width, args.height)
 end
 
 
@@ -144,12 +150,12 @@ do
 end
 
 do
-    local system_type = {
+    local dirs = {
         "gameplay",
         "render",
     }
-    for i = 1, #system_type do
-        local dir = assert(system_type[i])
+    for i = 1, #dirs do
+        local dir = assert(dirs[i])
         local systems = {}
         for name in file.dir(dir) do
             if name:match "%.lua$" then
@@ -161,7 +167,7 @@ do
         end)
         for j = 1, #systems do
             local system = assert(systems[j])
-            system.system_type = dir
+            system.type = dir
             tiny_add(system)
         end
     end

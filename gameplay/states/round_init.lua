@@ -9,14 +9,12 @@ local num_lives = NUM_LIVES
 local num_ghosts_eaten = 0
 
 return function(ctx)
-    local config = assert(ctx.world.config)
-    local colors = assert(config.colors)
-    local state = assert(ctx.world.state)
-    local commands = assert(state.commands)
+    local config = ctx.world.config
+    local colors = config.colors
+    local state = ctx.world.state
+    local commands = state.commands
 
-    local entities = ctx.entities
-    assert(#entities == 1, "expected exactly one entity in game state, got " .. tostring(#entities))
-    local e = entities[1]
+    local e = ctx.entity
 
     -- clear the "PLAYER ONE" text
     commands.texts {

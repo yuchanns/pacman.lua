@@ -1,13 +1,11 @@
 local flow = require "core.flow"
 
 return function(ctx)
-    local config = assert(ctx.world.config)
-    local colors = assert(config.colors)
-    local commands = assert(ctx.world.state.commands)
+    local config = ctx.world.config
+    local colors = config.colors
+    local commands = ctx.world.state.commands
 
-    local entities = ctx.entities
-    assert(#entities == 1, "expected exactly one entity in game state, got " .. tostring(#entities))
-    local e = entities[1]
+    local e = assert(ctx.entity)
 
     e.map.status = "init"
 

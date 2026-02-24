@@ -17,16 +17,16 @@ local sprites = util.cache(function(sprite)
     end)
 end)
 
-local function cache(tbl)
-    local sprite = tbl.sprite
-    local scale_x = tbl.scale_x or 1
-    local scale_y = tbl.scale_y or 1
-    local color = tbl.color or 0x00000000
+local function cache(layer)
+    local sprite = assert(layer.sprite, "sprite is required")
+    local scale_x = layer.scale_x or 1
+    local scale_y = layer.scale_y or 1
+    local color = layer.color or 0x00000000
     return sprites[sprite][scale_x][scale_y][color]
 end
 
 local function process(system, e)
-    local batch = assert(system.world.resources.batch)
+    local batch = system.world.resources.batch
 
     if not e.visible or not e.sprite then
         return
@@ -36,17 +36,15 @@ local function process(system, e)
     local actor = e.actor
     local pos = actor.pos
 
-    local scale_x = pos.sx
-    local scale_y = pos.sy
     local x = pos.x + pos.ox
     local y = pos.y + pos.oy
     for i = 1, #e.sprite do
-        local tbl = e.sprite[i]
+        local layer = e.sprite[i]
         batch:add(cache {
-            sprite = tbl.sprite,
-            scale_x = tbl.sx or scale_x,
-            scale_y = tbl.sy or scale_y,
-            color = tbl.color or color,
+            sprite = layer.sprite,
+            scale_x = layer.sx,
+            scale_y = layer.sy,
+            color = layer.color or color,
         }, x, y)
     end
 end

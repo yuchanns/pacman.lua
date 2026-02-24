@@ -10,9 +10,13 @@ local CMD = setmetatable({}, {
 local sprite_overrieds <const> = {
     ["."] = "tile_10",
 }
+---@type integer
 local default_color
+---@type table
 local color_overrides
+---@type integer
 local map_offset_y
+---@type integer
 local map_rows
 
 ---@type table
@@ -21,8 +25,8 @@ local TILES
 function CMD.init(map, world)
     map.tiles = {}
 
-    local sprites = assert(world.resources.sprites)
-    local config = assert(world.config)
+    local sprites = world.resources.sprites
+    local config = world.config
 
     for y = 1, config.display_tile_y do
         for x = 1, config.display_tile_x do
@@ -57,17 +61,17 @@ local function process(system, e)
     if not map.status then
         return
     end
-    CMD[map.status](map, assert(world))
+    CMD[map.status](map, world)
 end
 
 local function init(_, world)
-    local config = assert(world.config)
-    local resources = assert(world.resources)
+    local config = world.config
+    local resources = world.resources
     TILES = resources.tiles
-    map_offset_y = assert(config.map_offset_y)
-    map_rows = assert(config.map_rows)
+    map_offset_y = config.map_offset_y
+    map_rows = config.map_rows
 
-    local colors = assert(config.colors)
+    local colors = config.colors
     default_color = assert(colors.COLOR_FRIGHTENED)
     color_overrides = {
         ["."] = assert(colors.COLOR_DOT),

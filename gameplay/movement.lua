@@ -156,8 +156,8 @@ local function process(system, e)
 end
 
 local function init(_, world)
-    local config = assert(world.config)
-    local resources = assert(world.resources)
+    local config = world.config
+    local resources = world.resources
 
     TILE = config.tile
     HALF_TILE = TILE / 2
@@ -165,9 +165,9 @@ local function init(_, world)
     DISPLAY_PIXELS_Y = config.display_tile_y * TILE
 
     MAP_MIN_X = 0
-    MAP_MAX_X = assert(config.map_cols) - 1
-    MAP_MIN_Y = assert(config.map_offset_y)
-    MAP_MAX_Y = MAP_MIN_Y + assert(config.map_rows) - 1
+    MAP_MAX_X = config.map_cols - 1
+    MAP_MIN_Y = config.map_offset_y
+    MAP_MAX_Y = MAP_MIN_Y + config.map_rows - 1
 
     TILES = resources.tiles
 end

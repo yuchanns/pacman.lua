@@ -8,8 +8,8 @@ local TEXT
 local DEFAULT_TEXT_COLOR
 
 local function init(system)
-    local config = assert(system.world.config)
-    local colors = assert(config.colors)
+    local config = system.world.config
+    local colors = config.colors
     local font_id = assert(font.name "Pacman Tiles")
     DEFAULT_TEXT_COLOR = assert(colors.COLOR_DEFAULT)
 

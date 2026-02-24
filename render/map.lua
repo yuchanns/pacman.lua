@@ -24,22 +24,18 @@ local function region(name)
     end
 end
 
-local function resize(w, h)
+local function preWrap(system)
+    local batch = system.world.resources.batch
+    local config = system.world.config
+
     for i = 1, #layouts do
         local name = layouts[i]
         pos[name] = nil
         local d = dom[name]
         local screen = d["screen"]
-        screen.width = w
-        screen.height = h
+        screen.width = config.width
+        screen.height = config.height
     end
-end
-
-local function preWrap(system)
-    local batch = assert(system.world.resources.batch)
-    local config = assert(system.world.config)
-
-    resize(config.width, config.height)
 
     local world = assert(region "world")
 
@@ -47,12 +43,12 @@ local function preWrap(system)
 end
 
 local function postWrap(system)
-    local batch = assert(system.world.resources.batch)
+    local batch = system.world.resources.batch
     batch:layer()
 end
 
 local function process(system, e)
-    local batch = assert(system.world.resources.batch)
+    local batch = system.world.resources.batch
 
     for _, tile in ipairs(e.map.tiles) do
         if tile.sprite then

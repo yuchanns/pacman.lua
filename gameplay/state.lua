@@ -20,11 +20,27 @@ local function init(system)
 
     flow.load(states)
 
+    do
+        local mt = {
+            __index = function(_, k)
+                if k == "entity" then
+                    local entities = system.entities
+
+                    return assert(#entities == 1 and entities[1],
+                        "expected exactly one entity in game state, got " .. tostring(#entities))
+                end
+
+                return rawget(system, k)
+            end
+        }
+        setmetatable(system, mt)
+    end
+
     flow.enter(flow.state.init, system)
 end
 
 return tiny.system {
-    filter = tiny.requireAll("map"),
+    filter = tiny.requireAll "map",
 
     priority = 1,
 

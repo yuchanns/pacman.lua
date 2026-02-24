@@ -6,12 +6,13 @@ local border <const> = 20
 local offset_x, offset_y, scale = 0, 0, 1
 
 local function update(system)
-    local resize = system.world.state.commands.queue_resize
+    local queue = system.world.state.commands.queue_resize
+    if #queue == 0 then return end
 
-    local config = assert(system.world.config)
-    for i = 1, #resize do
-        local ev = assert(resize[i])
-        resize[i] = nil
+    local config = system.world.config
+    for i = 1, #queue do
+        local ev = assert(queue[i])
+        queue[i] = nil
         local w, h = ev.width, ev.height
         if w and h then
             config.width = w
@@ -28,8 +29,8 @@ local function update(system)
         offset_y = 0
         return
     end
-    local bw = assert(config.base_width)
-    local bh = assert(config.base_height)
+    local bw = config.base_width
+    local bh = config.base_height
     scale = math.min(w / bw, h / bh)
     if scale <= 0 then
         scale = 1
@@ -39,12 +40,12 @@ local function update(system)
 end
 
 local function preWrap(self)
-    local batch = assert(self.world.resources.batch)
+    local batch = self.world.resources.batch
     batch:layer(scale, offset_x, offset_y)
 end
 
 local function postWrap(self)
-    local batch = assert(self.world.resources.batch)
+    local batch = self.world.resources.batch
     batch:layer()
 end
 

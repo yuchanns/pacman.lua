@@ -6,44 +6,39 @@ local function process(system, e)
     end
     local state = system.world.state
     local anims = e.actor.anim
-    local position = e.actor.pos
     local cd = e.actor.dir
     if not cd then
         return
     end
 
-    position.sx = cd == "left" and -1 or 1
-    position.sy = cd == "up" and -1 or 1
+    if not e.sprite then
+        e.sprite = {}
+    end
 
     for idx, anim in ipairs(anims) do
-        local active = (cd == "up" or cd == "down") and anim.v or anim.h
-        local other = (active == anim.h) and anim.v or anim.h
+        local dirs = anim.dirs or {}
 
-        other:pause()
+        for k, v in pairs(dirs) do
+            if k ~= cd then
+                v.animation:pause()
+            end
+        end
 
+        local active = assert(dirs[cd], "invalid direction for animation: " .. cd)
         if state.freeze or e.blocked then
-            active:pauseAtStart()
+            active.animation:pauseAtStart()
         else
-            active:resume()
+            active.animation:resume()
         end
-        active:update(1 / 4)
+        active.animation:update(1 / 4)
 
-        if not e.sprite then
-            e.sprite = {}
-        end
-
-        local sx, sy
-
-        if anim.dir then
-            sx = anim.dir == "left" and -1 or 1 
-            sy = anim.dir == "up" and -1 or 1
-        end
+        local pos = active.animation.position
 
         e.sprite[idx] = {
-            sprite = active.frames[active.position],
+            sprite = active.animation.frames[pos],
             color = anim.color,
-            sx = sx,
-            sy = sy,
+            sx = active.sx,
+            sy = active.sy,
         }
     end
 end
