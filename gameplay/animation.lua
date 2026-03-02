@@ -1,11 +1,19 @@
 local tiny = require "core.tiny"
 
+local DT_PER_PIXEL = 0.0
+
+local function init(_, world)
+    local tile = world.config.tile
+    DT_PER_PIXEL = 4 / tile
+end
+
 local function process(system, e)
     if not e.visible or not e.actor.anim then
         return
     end
     local state = system.world.state
     local anims = e.actor.anim
+    local distance = e.actor.distance or 0
     local cd = e.actor.dir
     if not cd then
         return
@@ -25,12 +33,14 @@ local function process(system, e)
         end
 
         local active = assert(dirs[cd], "invalid direction for animation: " .. cd)
-        if state.freeze or e.blocked then
-            active.animation:pauseAtStart()
+        if state.freeze then
+            active.animation:pause()
         else
             active.animation:resume()
         end
-        active.animation:update(1 / 4)
+        if (not state.freeze) and distance > 0 then
+            active.animation:update(distance * DT_PER_PIXEL)
+        end
 
         local pos = active.animation.position
 
@@ -46,6 +56,8 @@ end
 return tiny.processingSystem {
     filter = tiny.requireAll "actor",
     priority = 5,
+
+    onAddToWorld = init,
 
     process = process,
 }

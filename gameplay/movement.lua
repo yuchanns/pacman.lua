@@ -99,6 +99,9 @@ end
 
 local function process(system, e)
     local state = system.world.state
+    local actor = e.actor
+    actor.distance = 0
+
     if state.freeze or e.state == "house" then
         return
     end
@@ -106,8 +109,6 @@ local function process(system, e)
     if not e.visible then
         return
     end
-
-    local actor = e.actor
 
     local cd = actor.dir
     if not cd then
@@ -131,6 +132,7 @@ local function process(system, e)
     local cy = pos.y + pos.oy
 
     local steps = (tick % 8 ~= 0) and 2 or 0
+    local distance = 0
 
     for _ = 1, steps do
         if can_move(cx, cy, wanted_dir, allow_cornering) then
@@ -140,10 +142,13 @@ local function process(system, e)
 
         if can_move(cx, cy, actor.dir, allow_cornering) then
             cx, cy = move(cx, cy, actor.dir, allow_cornering)
+            distance = distance + 1
         else
             break
         end
     end
+
+    actor.distance = distance
 
     e.blocked = not can_move(cx, cy, actor.dir, allow_cornering)
 
