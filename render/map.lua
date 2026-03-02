@@ -28,13 +28,16 @@ local function preWrap(system)
     local batch = system.world.resources.batch
     local config = system.world.config
 
-    for i = 1, #layouts do
-        local name = layouts[i]
-        pos[name] = nil
-        local d = dom[name]
-        local screen = d["screen"]
-        screen.width = config.width
-        screen.height = config.height
+    if config.resize_dirty then
+        for i = 1, #layouts do
+            local name = layouts[i]
+            pos[name] = nil
+            local d = dom[name]
+            local screen = d["screen"]
+            screen.width = config.width
+            screen.height = config.height
+        end
+        config.resize_dirty = false
     end
 
     local world = assert(region "world")

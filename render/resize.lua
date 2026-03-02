@@ -17,6 +17,7 @@ local function update(system)
         if w and h then
             config.width = w
             config.height = h
+            config.resize_dirty = true
         end
     end
 

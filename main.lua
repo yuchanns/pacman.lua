@@ -56,6 +56,7 @@ do
 
             width = args.width,
             height = args.height,
+            resize_dirty = false,
 
             tps = TPS,
             colors = cfg.colors,
