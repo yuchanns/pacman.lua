@@ -92,15 +92,5 @@ return function(ctx)
     }
 
     flow.sleep(2 * config.tps - 4)
-
-    state.freeze = false
-
-    -- clear the "READY!" text
-    commands.texts {
-        text = "      ",
-        x = 11,
-        y = 20,
-    }
-
-    return flow.state.idle, ctx
+    return flow.state.round_started, ctx
 end
