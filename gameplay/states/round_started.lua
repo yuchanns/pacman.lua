@@ -8,7 +8,6 @@ return function(ctx)
 
     -- clear the "READY!" text
     commands.texts {
-        text = "      ",
         x = 11,
         y = 20,
     }

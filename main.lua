@@ -69,7 +69,7 @@ do
         }, mt)
 
         world.state = setmetatable({
-            freeze = false,
+            freeze = true,
             commands = commands,
             score = 0,
             hiscore = 0,

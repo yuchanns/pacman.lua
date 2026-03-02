@@ -19,7 +19,6 @@ return function(ctx)
 
     -- clear the "PLAYER ONE" text
     commands.texts {
-        text = "         ",
         x = 9,
         y = 14,
     }

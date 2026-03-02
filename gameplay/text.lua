@@ -30,24 +30,26 @@ local function process(system, e)
     local config = assert(system.world.config)
 
     for i = 1, #queue do
-        local text = assert(queue[i])
+        local data = assert(queue[i])
         queue[i] = nil
 
-        local x, y = assert(text.x), assert(text.y)
-        local align = text.align or "left"
-        local cache = TEXT_CACHE[align][text.y]
-        local prev = cache[text.x]
+        local x, y = assert(data.x), assert(data.y)
+        local align = data.align or "left"
+        local cache = TEXT_CACHE[align][data.y]
+        local prev = cache[data.x]
         if prev then
             tiles[y * config.display_tile_x + prev + 1].sprite = nil
-            cache[text.x] = nil
+            cache[data.x] = nil
         end
-        if align == "right" then
-            x = x - #text.text + 1
+        if data.text then
+            if align == "right" then
+                x = x - #data.text + 1
+            end
+            local color = data.color or DEFAULT_TEXT_COLOR
+            local block = TEXT[color]
+            tiles[y * config.display_tile_x + x + 1].sprite = block(data.text, #data.text * config.tile, config.tile)
+            cache[data.x] = x
         end
-        local color = text.color or DEFAULT_TEXT_COLOR
-        local block = TEXT[color]
-        tiles[y * config.display_tile_x + x + 1].sprite = block(text.text, #text.text * config.tile, config.tile)
-        cache[text.x] = x
     end
 end
 
