@@ -31,7 +31,7 @@ from PIL import Image, ImageFilter
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 TILES_DIR = ROOT_DIR.parent / "assets" / "tiles"
-DEFAULT_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!"
+DEFAULT_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!"
 FALLBACK_TILE_SIZE = (16, 16)
 
 

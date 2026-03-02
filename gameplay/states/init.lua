@@ -4,6 +4,16 @@ return function(ctx)
     local config = ctx.world.config
     local colors = config.colors
     local commands = ctx.world.state.commands
+    local state = ctx.world.state
+
+    state.score = 0
+
+    commands.texts {
+        text = "00",
+        x = 6,
+        y = 1,
+        align = "right",
+    }
 
     local e = assert(ctx.entity)
 

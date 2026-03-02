@@ -19,6 +19,10 @@ local function init(system)
     end)
 end
 
+local TEXT_CACHE = util.cache(function()
+    return util.cache(function() return {} end)
+end)
+
 local function process(system, e)
     local queue = system.world.state.commands.queue_texts
     if #queue == 0 then return end
@@ -30,9 +34,20 @@ local function process(system, e)
         queue[i] = nil
 
         local x, y = assert(text.x), assert(text.y)
+        local align = text.align or "left"
+        local cache = TEXT_CACHE[align][text.y]
+        local prev = cache[text.x]
+        if prev then
+            tiles[y * config.display_tile_x + prev + 1].sprite = nil
+            cache[text.x] = nil
+        end
+        if align == "right" then
+            x = x - #text.text + 1
+        end
         local color = text.color or DEFAULT_TEXT_COLOR
         local block = TEXT[color]
         tiles[y * config.display_tile_x + x + 1].sprite = block(text.text, #text.text * config.tile, config.tile)
+        cache[text.x] = x
     end
 end
 

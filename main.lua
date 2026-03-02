@@ -63,12 +63,35 @@ do
             map_offset_y = cfg.map.display_offset_y,
             map_rows = map_rows,
             map_cols = map_cols,
+
+            num_dots = 244,
+            num_lives = 3,
         }, mt)
 
         world.state = setmetatable({
             freeze = false,
             commands = commands,
+            score = 0,
+            hiscore = 0,
+            round_won = false,
+            fruit_active = false,
+            num_dots_eaten = 0,
         }, mt)
+
+        do
+            local util = {}
+            function util.pixel_to_tile_pos(cx, cy)
+                local tx = math.floor(cx / tile)
+                local ty = math.floor(cy / tile)
+                return tx, ty
+            end
+
+            world.util = setmetatable(util, {
+                __index = function(_, k)
+                    error("unknown util: " .. tostring(k))
+                end
+            })
+        end
     end
 
     do

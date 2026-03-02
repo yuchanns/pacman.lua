@@ -1,11 +1,8 @@
 local flow = require "core.flow"
 
-local NUM_DOTS <const> = 244 -- 240 small dots + 4 pills
-local NUM_LIVES <const> = 3
-
 local round = 0
-local num_dots_eaten = 0
-local num_lives = NUM_LIVES
+---@type number
+local num_lives
 local num_ghosts_eaten = 0
 
 return function(ctx)
@@ -16,6 +13,10 @@ return function(ctx)
 
     local e = ctx.entity
 
+    if not num_lives then
+        num_lives = config.num_lives
+    end
+
     -- clear the "PLAYER ONE" text
     commands.texts {
         text = "         ",
@@ -24,13 +25,30 @@ return function(ctx)
     }
 
     -- Pacman has eaten all dots, start a new round
-    if num_dots_eaten >= NUM_DOTS then
+    if state.num_dots_eaten >= config.num_dots then
         round = round + 1
-        num_dots_eaten = 0
-        e.map.status = "init"
+        state.num_dots_eaten = 0
+        e.map.status = "reset"
+        num_lives = config.num_lives
+        state.score = 0
+        commands.texts {
+            text = "00",
+            x = 6,
+            y = 1,
+            align = "right",
+        }
+        commands.despawns {}
     else
         -- previous round was lost
         num_lives = num_lives - 1
+        state.score = 0
+        commands.texts {
+            text = "00",
+            x = 6,
+            y = 1,
+            align = "right",
+        }
+        commands.despawns {}
     end
 
     assert(num_lives >= 0)
@@ -51,6 +69,7 @@ return function(ctx)
         args = {
             visible = true,
             input = {},
+            player = true,
         },
     }
 

@@ -11,13 +11,6 @@ local function init(system)
         end
     end
 
-    function states.idle(args)
-        print "idle"
-
-        flow.sleep(58)
-        return flow.state.idle, args
-    end
-
     flow.load(states)
 
     do

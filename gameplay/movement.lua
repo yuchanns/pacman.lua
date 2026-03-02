@@ -1,6 +1,8 @@
 local tiny = require "core.tiny"
 
 local tick = 0
+---@type table
+local wutil
 
 ---@type number, number, number , number
 local TILE, HALF_TILE, DISPLAY_PIXELS_X, DISPLAY_PIXELS_Y
@@ -20,12 +22,6 @@ local function dist_to_tile_mid(cx, cy)
     local dx = HALF_TILE - (cx % TILE)
     local dy = HALF_TILE - (cy % TILE)
     return dx, dy
-end
-
-local function pixel_to_tile_pos(cx, cy)
-    local tx = math.floor(cx / TILE)
-    local ty = math.floor(cy / TILE)
-    return tx, ty
 end
 
 local function clamp_tile_pos(tx, ty)
@@ -60,7 +56,7 @@ local function can_move(cx, cy, wanted_dir, allow_cornering)
         perp_dist_mid = disty
     end
 
-    local tx, ty = pixel_to_tile_pos(cx, cy)
+    local tx, ty = wutil.pixel_to_tile_pos(cx, cy)
     local check_tx, check_ty = clamp_tile_pos(tx + vx, ty + vy)
     local blocked = is_blocking(check_tx, check_ty)
 
@@ -153,11 +149,17 @@ local function process(system, e)
 
     pos.x = cx - pos.ox
     pos.y = cy - pos.oy
+
+    if e.player then
+        local commands = system.world.state.commands
+        commands.player_move(pos)
+    end
 end
 
 local function init(_, world)
     local config = world.config
     local resources = world.resources
+    wutil = world.util
 
     TILE = config.tile
     HALF_TILE = TILE / 2

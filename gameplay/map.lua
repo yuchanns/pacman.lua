@@ -55,6 +55,31 @@ function CMD.init(map, world)
     map.status = nil
 end
 
+function CMD.reset(map, world)
+    local sprites = world.resources.sprites
+    local config = world.config
+    for y = 1, config.display_tile_y do
+        for x = 1, config.display_tile_x do
+            if y > map_offset_y and y <= map_offset_y + map_rows then
+                local i = y - map_offset_y
+                local line = assert(TILES[i])
+                local c = line:sub(x, x)
+                if c ~= "" then
+                    local sprite_id = sprite_overrieds[c] or ("tile_" .. c)
+                    local base_sprite = sprites[sprite_id]
+                    if base_sprite then
+                        assert(math.type(base_sprite) == "integer")
+                        local color = color_overrides[c] or default_color
+                        local sprite = matmask.mask(base_sprite, color)
+                        map.tiles[(y - 1) * config.display_tile_x + x].sprite = sprite
+                    end
+                end
+            end
+        end
+    end
+    map.status = nil
+end
+
 local function process(system, e)
     local world = system.world
     local map = e.map

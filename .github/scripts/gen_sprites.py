@@ -328,7 +328,8 @@ def simulate_tile_usage() -> Dict[int, Set[int]]:
     vid_color_score(state, (6, 1), COLOR_CODE_LOOKUP["default"], 98765432)
     vid_color_score(state, (16, 1), COLOR_CODE_LOOKUP["default"], 0)
     for idx, digit in enumerate("0123456789"):
-        vid_color_char(state, (20 + idx, 2), COLOR_CODE_LOOKUP["default"], digit)
+        # Keep all digits inside the 28-column tile viewport so usage is recorded.
+        vid_color_char(state, (18 + idx, 2), COLOR_CODE_LOOKUP["default"], digit)
 
     for color_code in (COLOR_CODE_LOOKUP["pacman"], 0):
         vid_draw_tile_quad(state, (2, 34), color_code, TILE_LIFE)
@@ -379,13 +380,14 @@ def simulate_tile_usage() -> Dict[int, Set[int]]:
 
 
 DEFAULT_TEXT_CHARACTERS = tuple(chr(code) for code in range(ord('A'), ord('Z') + 1))
+DEFAULT_TEXT_DIGITS = tuple(chr(code) for code in range(ord('0'), ord('9') + 1))
 DEFAULT_TEXT_PUNCTUATION = ("!", "-")
 
 
 def ensure_default_character_usage(tile_usage: Dict[int, Set[int]]) -> None:
     """Guarantee that plain alphabet tiles (and needed punctuation) get default palettes."""
     default_code = COLOR_CODE_LOOKUP["default"]
-    for char in DEFAULT_TEXT_CHARACTERS + DEFAULT_TEXT_PUNCTUATION:
+    for char in DEFAULT_TEXT_CHARACTERS + DEFAULT_TEXT_DIGITS + DEFAULT_TEXT_PUNCTUATION:
         tile_code = conv_char(char)
         tile_usage.setdefault(tile_code, set()).add(default_code)
 
