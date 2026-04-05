@@ -1,3 +1,6 @@
 assets/sprites/*.png
 assets/tiles/*.png
 assets/fonts/*.ttf
+website/node_modules/
+website/dist/
+website/public/runtime/
